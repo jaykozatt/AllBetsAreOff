@@ -10,10 +10,19 @@ public class WireController : StaticInstance<WireController>
     
     private DistanceJoint2D joint;
     private Rigidbody2D rb;
-    public float angularVelocity = 1;
+    public float velocity = 1;
+    public float lengthRate = 1;
 
     PlayerController Player {
         get => PlayerController.Instance;
+    }
+
+    private void OnCollisionEnter2D(Collision2D other) 
+    {
+        if (other.collider.CompareTag("Player"))
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     protected override void Awake() 
@@ -24,13 +33,13 @@ public class WireController : StaticInstance<WireController>
         linePositions = new List<Vector3>();
 
         joint = GetComponent<DistanceJoint2D>();
-        rb = GetComponent<Rigidbody2D>();
+        rb = GetComponentInParent<Rigidbody2D>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        BeginSwing();
+        // BeginSwing();
     }
 
     // Update is called once per frame
@@ -40,14 +49,14 @@ public class WireController : StaticInstance<WireController>
         DrawWire();
     }
 
-    void BeginSwing()
-    {
-        Vector2 radius = (Player.transform.position - transform.position);
-        Vector2 direction = -radius.normalized;
-        (direction.x, direction.y) = (direction.y, -direction.x);
+    // void BeginSwing()
+    // {
+    //     Vector2 radius = (Player.transform.position - transform.position);
+    //     Vector2 direction = -radius.normalized;
+    //     (direction.x, direction.y) = (direction.y, -direction.x);
 
-        rb.velocity = direction * radius.magnitude * angularVelocity;
-    }
+    //     rb.velocity = direction * radius.magnitude * angularVelocity;
+    // }
 
     void SwingDie()
     {
@@ -56,9 +65,9 @@ public class WireController : StaticInstance<WireController>
         (direction.x, direction.y) = (direction.y, -direction.x);
 
         
-        rb.velocity = direction * radius.magnitude * angularVelocity;
+        // rb.velocity = (direction - radius).normalized * radius.magnitude * angularVelocity;
 
-        // rb.AddForce(direction * radius.magnitude * angularVelocity * angularVelocity);
+        rb.AddForce(rb.mass * (direction - radius).normalized / radius.magnitude * velocity * velocity);
     }
 
     void DrawWire()
@@ -70,4 +79,11 @@ public class WireController : StaticInstance<WireController>
 
         line.SetPositions(linePositions.ToArray());
     }
+
+    public void LengthenWire()
+    {
+        joint.distance = Mathf.Min(8, joint.distance + lengthRate * Time.deltaTime) ;
+    }
+
+    public void ShortenWire() => joint.distance = Mathf.Max(0, joint.distance - lengthRate * Time.deltaTime);
 }
