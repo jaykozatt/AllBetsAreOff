@@ -21,6 +21,9 @@ public class PlayerController : StaticInstance<PlayerController>
         input.x = Input.GetAxis("Horizontal");
         input.y = Input.GetAxis("Vertical");
 
-        rb.AddForce(input * speed);
+        rb.AddForce(rb.mass * input * speed);
+
+        if (Input.GetKey(KeyCode.Space)) WireController.Instance.LengthenWire();
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) WireController.Instance.ShortenWire();
     }
 }
