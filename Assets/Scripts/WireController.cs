@@ -33,7 +33,7 @@ public class WireController : StaticInstance<WireController>
         linePositions = new List<Vector3>();
 
         joint = GetComponent<DistanceJoint2D>();
-        rb = GetComponent<Rigidbody2D>();
+        rb = GetComponentInParent<Rigidbody2D>();
     }
 
     // Start is called before the first frame update
