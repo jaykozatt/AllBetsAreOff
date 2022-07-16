@@ -20,6 +20,7 @@ public class WireController : StaticInstance<WireController>
     private Transform pivot;
     private bool isTangled = false;
     private bool isDeploying = false;
+    private int flipper = 1;
 
     private List<Transform> pointsTangled;
     Coroutine reelBack;
@@ -37,8 +38,21 @@ public class WireController : StaticInstance<WireController>
         {
             this.enabled = false;
         }
+        else if (!other.collider.CompareTag("Player"))
+        {
+            flipper = flipper == 1 ? -1 : 1;
+            rb.velocity = other.relativeVelocity;
+        }
+        
     }
 
+    private void OnCollisionStay2D(Collision2D other) 
+    {
+        if (other.collider.CompareTag("Player") && !isDeploying && !isTangled)
+        {
+            this.enabled = false;
+        }
+    }
     private void OnEnable() {
         renderer.enabled = true;
         collider.enabled = true;
@@ -99,7 +113,7 @@ public class WireController : StaticInstance<WireController>
             Vector2 direction = -radius.normalized;
             (direction.x, direction.y) = (direction.y, -direction.x);
 
-            rb.AddForce(rb.mass * (direction - radius).normalized / radius.magnitude * velocity * velocity);
+            rb.AddForce(rb.mass * (flipper*direction - radius).normalized / radius.magnitude * velocity * velocity);
         }
     }
 
@@ -147,8 +161,11 @@ public class WireController : StaticInstance<WireController>
             isDeploying = true;
             StartCoroutine(DeployTimer());
         }
+        else
+        {
+            joint.distance = Mathf.Min(8, joint.distance + lengthRate * Time.deltaTime);
+        }
 
-        joint.distance = Mathf.Min(8, joint.distance + lengthRate * Time.deltaTime);
         
         // if (cam.m_Lens.OrthographicSize < joint.distance) 
         //     cam.m_Lens.OrthographicSize = joint.distance;
