@@ -10,6 +10,11 @@ public class Wire : MonoBehaviour
     List<Vector2> positions;
     new EdgeCollider2D  collider;
 
+    private void OnTriggerEnter2D(Collider2D other) 
+    {
+        WireController.Instance.TangleWireTo(other);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
