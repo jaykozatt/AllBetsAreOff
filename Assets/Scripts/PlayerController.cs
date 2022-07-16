@@ -41,7 +41,13 @@ public class PlayerController : StaticInstance<PlayerController>
         if (!WireController.Instance.IsTangled)
         {
             if (Input.GetKey(KeyCode.Space)) WireController.Instance.LengthenWire();
-            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) WireController.Instance.ShortenWire();
+            
+            float wireLength = WireController.Instance.joint.distance;
+            if (wireLength > 3 && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ) 
+                WireController.Instance.ShortenWire();
+            else if (wireLength <=3 && (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)))
+                WireController.Instance.ReelBack();
+
         }
         else
         {

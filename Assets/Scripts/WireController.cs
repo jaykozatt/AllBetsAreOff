@@ -7,6 +7,7 @@ using Cinemachine;
 public class WireController : StaticInstance<WireController>
 {
     public CinemachineVirtualCamera cam;
+    private Shadow shadow;
 
     public LineRenderer line;
     public List<Vector3> linePositions;
@@ -56,13 +57,15 @@ public class WireController : StaticInstance<WireController>
     private void OnEnable() {
         renderer.enabled = true;
         collider.enabled = true;
-        line.enabled = true;    
+        line.enabled = true;
+        shadow.gameObject.SetActive(true);    
     }
 
     private void OnDisable() {
         renderer.enabled = false;
         collider.enabled = false;
         line.enabled = false;
+        shadow.gameObject.SetActive(false);
     }
 
     protected override void Awake() 
@@ -73,10 +76,13 @@ public class WireController : StaticInstance<WireController>
         linePositions = new List<Vector3>();
         pointsTangled = new List<Transform>();
 
-        joint = GetComponent<DistanceJoint2D>();
+        joint = GetComponentInParent<DistanceJoint2D>();
         rb = GetComponentInParent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
         renderer = GetComponent<SpriteRenderer>();
+
+        shadow = transform.parent.GetComponentInChildren<Shadow>();
+        shadow.caster = transform;
     }
 
     // Start is called before the first frame update
@@ -173,12 +179,15 @@ public class WireController : StaticInstance<WireController>
 
     public void ShortenWire()
     {
-        joint.distance = Mathf.Max(0, joint.distance - lengthRate * Time.deltaTime);
-
-        reelBack = StartCoroutine(ReelBack());
+        joint.distance = Mathf.Max(3, joint.distance - lengthRate * Time.deltaTime);
 
         // if (cam.m_Lens.OrthographicSize > 5 && cam.m_Lens.OrthographicSize > joint.distance)
         //     cam.m_Lens.OrthographicSize = Mathf.Max(5, joint.distance);
+    }
+
+    public void ReelBack()
+    {
+        reelBack = StartCoroutine(ReelBackRoutine());
     }
 
     public List<Transform> GetTangledPoints()
@@ -186,7 +195,7 @@ public class WireController : StaticInstance<WireController>
         return pointsTangled;
     }
 
-    IEnumerator ReelBack()
+    IEnumerator ReelBackRoutine()
     {
         while (this.enabled)
         {
