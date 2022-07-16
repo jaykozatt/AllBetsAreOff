@@ -38,6 +38,18 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: background 1
+    uniqueID: 1558229033
+    locked: 0
+  - name: background 2
+    uniqueID: 3677476805
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Props
+    uniqueID: 3749212177
+    locked: 0
+  - name: Player
+    uniqueID: 1906449287
     locked: 0
