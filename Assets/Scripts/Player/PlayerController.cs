@@ -5,6 +5,10 @@ using UnityEngine;
 public class PlayerController : StaticInstance<PlayerController>
 {
 
+    public int lives = 3;
+    public int invincibilityFrames = 10;
+    private int framesUntilVulnerable = 0;
+
     public float speed;
     Vector2 input;
     public Rigidbody2D rb;
@@ -58,6 +62,8 @@ public class PlayerController : StaticInstance<PlayerController>
                 reelCrash = StartCoroutine(ReelCrash());
             }
         }
+
+        framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - 1);
     }
 
     IEnumerator ReelCrash()
@@ -89,4 +95,18 @@ public class PlayerController : StaticInstance<PlayerController>
 
         isReeling = false;
     }
+
+    public void GetHurt()
+    {
+        if (framesUntilVulnerable <= 0 && !isReeling)
+        {
+            lives = Mathf.Max(0, lives - 1);
+            framesUntilVulnerable = invincibilityFrames;
+            LivesInterface.Instance.UpdateDisplay(lives);
+
+            if (lives <= 0) GameManager.Instance.LoseGame();
+        }
+
+    }
+
 }

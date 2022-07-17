@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
 {
     public int numberOfChips = 1;
     public int scorePerChip = 100;
+    public int massPerChip = 2;
 
     public float speed = 5;
     public int minimumDistance = 1;
@@ -15,6 +16,14 @@ public class Enemy : MonoBehaviour
     private WaitForSeconds stunTimer = new WaitForSeconds(5);
 
     Coroutine followAI;
+
+    private void OnCollisionEnter2D(Collision2D other) 
+    {
+        if (other.collider.CompareTag("Player"))
+        {
+            PlayerController.Instance.GetHurt();
+        }
+    }
 
     private void OnDestroy() {
 
@@ -42,7 +51,7 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        rb.mass = 50 * numberOfChips;
+        rb.mass = massPerChip * numberOfChips;
         rb.drag = 5;
 
         followAI = StartCoroutine(FollowAI(PlayerController.Instance.transform));
