@@ -7,6 +7,8 @@ public class Enemy : MonoBehaviour
     public int numberOfChips = 1;
     public int scorePerChip = 100;
     public int massPerChip = 2;
+    public ParticleSystem toppleFX;
+    public List<SpriteRenderer> stack;
 
     public float speed = 5;
     public int minimumDistance = 1;
@@ -17,6 +19,7 @@ public class Enemy : MonoBehaviour
 
     Coroutine followAI;
 
+
     private void OnCollisionEnter2D(Collision2D other) 
     {
         if (other.collider.CompareTag("Player"))
@@ -25,27 +28,16 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void OnDestroy() {
-
-        if (numberOfChips > 1)
-        {
-            // Split in half
-
-            GameManager.Instance.AddScore(scorePerChip * numberOfChips / 2);
-        }
-        else
-        {
-            if (GameManager.Instance != null)
-                GameManager.Instance.AddScore(scorePerChip);
-        }
-
+    private void OnDestroy()
+    {
         StopCoroutine(followAI);
-
     }
 
+    [ExecuteInEditMode]
     private void Awake() 
     {
-        rb = GetComponent<Rigidbody2D>();
+        rb = GetComponentInChildren<Rigidbody2D>();
+        GetComponentsInChildren<SpriteRenderer>(stack);
     }
 
     // Start is called before the first frame update
@@ -57,6 +49,29 @@ public class Enemy : MonoBehaviour
         followAI = StartCoroutine(FollowAI(PlayerController.Instance.transform));
     }
 
+    public void GetDamaged(int chipsOfDamage)
+    {
+        if (numberOfChips > 1)
+        {
+            numberOfChips = Mathf.Max(0, numberOfChips - chipsOfDamage);
+            stack[numberOfChips].gameObject.SetActive(false);
+            GameManager.Instance.AddScore(chipsOfDamage * scorePerChip);
+        }
+        else
+        {
+            GameManager.Instance.AddScore(1 * scorePerChip);
+            Destroy(gameObject);
+        }
+        
+        ParticleSystem.EmissionModule emission = toppleFX.emission;
+        ParticleSystem.Burst burst = emission.GetBurst(0);
+        burst.count = chipsOfDamage;
+
+        emission.SetBurst(0, burst);
+        
+        toppleFX.transform.position = stack[numberOfChips].transform.position;
+        toppleFX.Play();
+    }
 
     IEnumerator FollowAI(Transform target)
     {

@@ -5,14 +5,28 @@ using UnityEngine;
 public class Wire : MonoBehaviour
 {
 
-    Vector2 playerPos;
+    Vector2 pivotPos;
     Vector2 diePos;
     List<Vector2> positions;
     new EdgeCollider2D  collider;
 
     private void OnTriggerEnter2D(Collider2D other) 
     {
-        DiceController.Instance.TangleWireTo(other);
+        if (!other.CompareTag("Untagged"))
+        {
+            DiceController.Instance.TangleWireTo(other);
+        }
+        else
+        {
+            if (!other.CompareTag("Indestructible"))
+            {
+                Enemy enemy = other.GetComponent<Enemy>();
+                int damage = enemy.numberOfChips / 2;
+                
+                enemy.GetDamaged(damage);
+            }
+
+        }
     }
 
     // Start is called before the first frame update
@@ -25,12 +39,12 @@ public class Wire : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        playerPos = PlayerController.Instance.transform.position - transform.position;
+        pivotPos = DiceController.Instance.pivot.position - transform.position;
         diePos = DiceController.Instance.transform.position - transform.position;
 
         positions.Clear();
         positions.Add(diePos);
-        positions.Add(playerPos);
+        positions.Add(pivotPos);
 
         collider.SetPoints(positions);
     }

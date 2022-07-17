@@ -18,19 +18,26 @@ public class DiceController : StaticInstance<DiceController>
     private new SpriteRenderer renderer;
     public float velocity = 1;
     public float lengthRate = 1;
-    private Transform pivot;
+    public Transform pivot;
     private bool isTangled = false;
     private bool isDeploying = false;
     private int flipper = 1;
+    private int diceNumber = 0;
+
+    public Sprite[] dice;
 
     private List<Transform> pointsTangled;
     Coroutine reelBack;
+    Coroutine diceCycler;
 
     PlayerController Player {
         get => PlayerController.Instance;
     }
     public bool IsTangled {
         get => isTangled;
+    }
+    public int CurrentDice {
+        get => diceNumber + 1;
     }
 
     private void OnCollisionEnter2D(Collision2D other) 
@@ -68,6 +75,12 @@ public class DiceController : StaticInstance<DiceController>
         shadow.gameObject.SetActive(false);
     }
 
+    private void OnDestroy() 
+    {
+        if (diceCycler != null) StopCoroutine(diceCycler);
+        if (reelBack != null) StopCoroutine(reelBack);
+    }
+
     protected override void Awake() 
     {
         base.Awake();
@@ -88,7 +101,7 @@ public class DiceController : StaticInstance<DiceController>
     // Start is called before the first frame update
     void Start()
     {
-        // BeginSwing();
+        diceCycler = StartCoroutine(DiceCycler());
         pivot = PlayerController.Instance.transform;
     }
 
@@ -98,15 +111,6 @@ public class DiceController : StaticInstance<DiceController>
         SwingDie();
         DrawWire();
     }
-
-    // void BeginSwing()
-    // {
-    //     Vector2 radius = (Player.transform.position - transform.position);
-    //     Vector2 direction = -radius.normalized;
-    //     (direction.x, direction.y) = (direction.y, -direction.x);
-
-    //     rb.velocity = direction * radius.magnitude * angularVelocity;
-    // }
 
     void SwingDie()
     {
@@ -209,6 +213,17 @@ public class DiceController : StaticInstance<DiceController>
     {
         yield return new WaitForSeconds(0.25f);
         isDeploying = false;
+    }
+
+    IEnumerator DiceCycler()
+    {
+        while (true) 
+        {
+            yield return new WaitForSeconds(1);
+
+            diceNumber = Random.Range(0, dice.Length);
+            renderer.sprite = dice[diceNumber];
+        }
     }
 
 }

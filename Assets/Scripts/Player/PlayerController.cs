@@ -76,7 +76,6 @@ public class PlayerController : StaticInstance<PlayerController>
     {
         Vector2 attackVector;
         Transform target;
-        int indestructible = LayerMask.NameToLayer("Indestructible");
         while (targets.Count > 0)
         {
             target = targets[0];
@@ -92,7 +91,7 @@ public class PlayerController : StaticInstance<PlayerController>
 
                 // targets.RemoveAt(0);
                 DiceController.Instance.Detangle();
-                if (target.gameObject.layer != indestructible)
+                if (!target.CompareTag("Indestructible"))
                     Destroy(target.gameObject);
                 
                 targetWasReached = false;
@@ -111,7 +110,7 @@ public class PlayerController : StaticInstance<PlayerController>
             LivesInterface.Instance.UpdateDisplay(lives);
             LivesInterface.Instance.HurtFlash();
 
-            if (lives <= 0) GameManager.Instance.LoseGame();
+            if (lives <= 0) GameManager.Instance.EndGame();
         }
 
     }

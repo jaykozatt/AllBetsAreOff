@@ -8,7 +8,7 @@ public enum GameState {None, Started, Paused, Ended}
 public class GameManager : StaticInstance<GameManager>
 {
 
-
+    
     [SerializeField] int score = 0;
     public GameState gameState = GameState.Started;
 
@@ -38,7 +38,7 @@ public class GameManager : StaticInstance<GameManager>
         SceneManager.LoadScene(0);
     }
 
-    public void LoseGame()
+    public void EndGame()
     {
         gameOverDisplay.SetActive(true);
         gameState = GameState.Ended;

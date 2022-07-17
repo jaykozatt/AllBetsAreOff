@@ -46,6 +46,7 @@ public class LivesInterface : StaticInstance<LivesInterface>
     {
         hurtScreen.SetActive(true);
         yield return null;
+        yield return null;
         hurtScreen.SetActive(false);
         
     }
