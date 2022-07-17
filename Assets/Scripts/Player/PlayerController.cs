@@ -38,22 +38,22 @@ public class PlayerController : StaticInstance<PlayerController>
 
         rb.AddForce(rb.mass * input * speed);
 
-        if (!WireController.Instance.IsTangled)
+        if (!DiceController.Instance.IsTangled)
         {
-            if (Input.GetKey(KeyCode.Space)) WireController.Instance.LengthenWire();
+            if (Input.GetKey(KeyCode.Space)) DiceController.Instance.LengthenWire();
             
-            float wireLength = WireController.Instance.joint.distance;
+            float wireLength = DiceController.Instance.joint.distance;
             if (wireLength > 3 && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ) 
-                WireController.Instance.ShortenWire();
+                DiceController.Instance.ShortenWire();
             else if (wireLength <=3 && (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)))
-                WireController.Instance.ReelBack();
+                DiceController.Instance.ReelBack();
 
         }
         else
         {
             if (!isReeling && (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)))
             {
-                targets = WireController.Instance.GetTangledPoints();
+                targets = DiceController.Instance.GetTangledPoints();
                 isReeling = true;
                 reelCrash = StartCoroutine(ReelCrash());
             }
@@ -64,6 +64,7 @@ public class PlayerController : StaticInstance<PlayerController>
     {
         Vector2 attackVector;
         Transform target;
+        int indestructible = LayerMask.NameToLayer("Indestructible");
         while (targets.Count > 0)
         {
             target = targets[0];
@@ -78,8 +79,9 @@ public class PlayerController : StaticInstance<PlayerController>
                 target = targets[0];
 
                 // targets.RemoveAt(0);
-                WireController.Instance.Detangle();
-                Destroy(target.gameObject);
+                DiceController.Instance.Detangle();
+                if (target.gameObject.layer != indestructible)
+                    Destroy(target.gameObject);
                 
                 targetWasReached = false;
             }

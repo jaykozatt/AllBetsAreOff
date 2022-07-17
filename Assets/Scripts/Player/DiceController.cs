@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 using Cinemachine;
 
-public class WireController : StaticInstance<WireController>
+public class DiceController : StaticInstance<DiceController>
 {
     public CinemachineVirtualCamera cam;
     private Shadow shadow;

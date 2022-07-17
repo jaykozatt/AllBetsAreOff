@@ -12,7 +12,7 @@ public class Wire : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other) 
     {
-        WireController.Instance.TangleWireTo(other);
+        DiceController.Instance.TangleWireTo(other);
     }
 
     // Start is called before the first frame update
@@ -26,7 +26,7 @@ public class Wire : MonoBehaviour
     void Update()
     {
         playerPos = PlayerController.Instance.transform.position - transform.position;
-        diePos = WireController.Instance.transform.position - transform.position;
+        diePos = DiceController.Instance.transform.position - transform.position;
 
         positions.Clear();
         positions.Add(diePos);
