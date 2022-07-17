@@ -52,7 +52,7 @@ TagManager:
   - name: Props
     uniqueID: 3749212177
     locked: 0
-  - name: Player
+  - name: Actors
     uniqueID: 1906449287
     locked: 0
   - name: UI

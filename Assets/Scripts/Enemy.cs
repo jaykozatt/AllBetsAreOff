@@ -39,6 +39,11 @@ public class Enemy : MonoBehaviour
     {
         rb = GetComponentInChildren<Rigidbody2D>();
         GetComponentsInChildren<SpriteRenderer>(stack);
+
+        string particlesPath = "/Managers/ParticleSystems/";
+        string topplePath = particlesPath + (CompareTag("Tough") ? "Purple Enemy" : "Blue Enemy");
+
+        toppleFX = GameObject.Find(topplePath).GetComponent<ParticleSystem>();
     }
 
     // Start is called before the first frame update

@@ -39,7 +39,7 @@ public class PlayerController : StaticInstance<PlayerController>
     {
         if (GameManager.Instance.gameState == GameState.Started)
             ProcessInput();        
-
+        print (rb.velocity.magnitude);
         framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - 1);
     }
 
@@ -100,6 +100,8 @@ public class PlayerController : StaticInstance<PlayerController>
                 targetWasReached = false;
             }
         }
+
+        // while (rb.velocity.magnitude > )
 
         isReeling = false;
     }
