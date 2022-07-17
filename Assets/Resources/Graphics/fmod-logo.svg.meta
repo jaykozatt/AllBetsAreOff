@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 87cb2157d44d50d47982cdb5df7277d7
+guid: b9549d528cddcc542aafd4a9975f6d96
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -12,8 +12,8 @@ ScriptedImporter:
   texturedSpriteMeshType: 1
   svgPixelsPerUnit: 100
   gradientResolution: 64
-  alignment: 9
-  customPivot: {x: 0.5, y: 0.15}
+  alignment: 0
+  customPivot: {x: 0, y: 0}
   generatePhysicsShape: 0
   viewportOptions: 0
   preserveViewport: 0
@@ -39,17 +39,17 @@ ScriptedImporter:
   spriteData:
     TessellationDetail: 0
     SpriteRect:
-      name: Tall Pillar
+      name: 
       originalName: 
-      pivot: {x: 0.5, y: 0.15}
-      alignment: 9
+      pivot: {x: 0, y: 0}
+      alignment: 0
       border: {x: 0, y: 0, z: 0, w: 0}
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 100
-        height: 256
-      spriteID: b5692d0e04871d44e9d20cbdb0d3d46e
+        width: 0
+        height: 0
+      spriteID: 3f4c508fc905fbf4a949c7c347ad08a9
       internalID: 0
     PhysicsOutlines: []

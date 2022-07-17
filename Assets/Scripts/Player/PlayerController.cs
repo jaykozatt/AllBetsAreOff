@@ -5,6 +5,9 @@ using UnityEngine;
 public class PlayerController : StaticInstance<PlayerController>
 {
 
+    public FMODUnity.EventReference tackleSFX;
+    private FMOD.Studio.EventInstance tackleInstance;
+
     public int lives = 3;
     public int invincibilityFrames = 10;
     private int framesUntilVulnerable = 0;
@@ -25,13 +28,19 @@ public class PlayerController : StaticInstance<PlayerController>
         if (isReeling && other.collider.gameObject.layer == defaultLayer)
         {
             targetWasReached = true;
+            tackleInstance.start();
         }
+    }
+
+    private void OnDestroy() {
+        tackleInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
     }
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
     }
 
     // Update is called once per frame
@@ -101,7 +110,10 @@ public class PlayerController : StaticInstance<PlayerController>
             }
         }
 
-        // while (rb.velocity.magnitude > )
+        while (rb.velocity.magnitude > 10)
+        {
+            yield return null;
+        }
 
         isReeling = false;
     }
@@ -115,7 +127,11 @@ public class PlayerController : StaticInstance<PlayerController>
             LivesInterface.Instance.UpdateDisplay(lives);
             LivesInterface.Instance.HurtFlash();
 
-            if (lives <= 0) GameManager.Instance.EndGame();
+            if (lives <= 0) 
+            {
+                GameManager.Instance.EndGame();
+                Destroy(transform.parent.gameObject);
+            }
         }
 
     }

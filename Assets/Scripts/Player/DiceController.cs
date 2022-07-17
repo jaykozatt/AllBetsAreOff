@@ -6,6 +6,9 @@ using Cinemachine;
 
 public class DiceController : StaticInstance<DiceController>
 {
+    public FMODUnity.EventReference impactSFX;
+    private FMOD.Studio.EventInstance impactInstance;
+
     public CinemachineVirtualCamera cam;
     private Shadow shadow;
 
@@ -54,6 +57,8 @@ public class DiceController : StaticInstance<DiceController>
             Enemy enemy;
             if (other.gameObject.TryGetComponent<Enemy>(out enemy))
                 enemy.GetDamaged(1);
+
+            impactInstance.start();
         }
         
     }
@@ -83,6 +88,7 @@ public class DiceController : StaticInstance<DiceController>
     {
         if (diceCycler != null) StopCoroutine(diceCycler);
         if (reelBack != null) StopCoroutine(reelBack);
+        impactInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
     }
 
     protected override void Awake() 
@@ -107,6 +113,7 @@ public class DiceController : StaticInstance<DiceController>
     {
         diceCycler = StartCoroutine(DiceCycler());
         pivot = PlayerController.Instance.transform;
+        impactInstance = FMODUnity.RuntimeManager.CreateInstance(impactSFX);
     }
 
     // Update is called once per frame

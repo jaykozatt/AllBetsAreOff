@@ -5,6 +5,12 @@ using System.Linq;
 
 public class Enemy : MonoBehaviour
 {
+    public FMODUnity.EventReference tackleSFX;
+    private FMOD.Studio.EventInstance tackleInstance;
+
+    public FMODUnity.EventReference chipsSFX;
+    private FMOD.Studio.EventInstance chipsInstance;
+
     [HideInInspector] public int numberOfChips = 1;
     public int scorePerChip = 100;
     public int massPerChip = 2;
@@ -26,15 +32,17 @@ public class Enemy : MonoBehaviour
         if (other.collider.CompareTag("Player"))
         {
             PlayerController.Instance.GetHurt();
+            tackleInstance.start();
         }
     }
 
     private void OnDestroy()
     {
         StopCoroutine(followAI);
+        tackleInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        chipsInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
     }
 
-    [ExecuteInEditMode]
     private void Awake() 
     {
         rb = GetComponentInChildren<Rigidbody2D>();
@@ -53,6 +61,9 @@ public class Enemy : MonoBehaviour
         rb.mass = massPerChip * numberOfChips;
         rb.drag = 5;
 
+        tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
+        chipsInstance = FMODUnity.RuntimeManager.CreateInstance(chipsSFX);
+
         followAI = StartCoroutine(FollowAI(PlayerController.Instance.transform));
     }
 
@@ -70,6 +81,9 @@ public class Enemy : MonoBehaviour
         numberOfChips = Mathf.Max(0, numberOfChips - chipsOfDamage);
         stack[numberOfChips].gameObject.SetActive(false);
         GameManager.Instance.AddScore(chipsOfDamage * scorePerChip);
+
+        chipsInstance.setParameterByName("Number of chips", chipsOfDamage);
+        chipsInstance.start();
         
         if (numberOfChips < 1) Destroy(gameObject);
     }
@@ -80,7 +94,7 @@ public class Enemy : MonoBehaviour
 
         yield return stunTimer;
 
-        while (GameManager.Instance.gameState != GameState.Ended)
+        while (GameManager.Instance.gameState < GameState.Ended)
         {
             if (GameManager.Instance.gameState == GameState.Paused)
             {

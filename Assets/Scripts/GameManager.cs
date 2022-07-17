@@ -5,7 +5,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public enum GameState {None, Started, Paused, Ended}
+public enum GameState {Paused, Started, Ended}
 public class GameManager : StaticInstance<GameManager>
 {
 
@@ -33,7 +33,7 @@ public class GameManager : StaticInstance<GameManager>
         scoreUI.text = $"Score: {score}";
         timerUI.text = string.Format("{00}:{1:00}", (int)survivalTime / 60, (int)survivalTime % 60);
     
-        if (!MissionText.Instance.gameObject.activeInHierarchy)
+        if (!MissionText.Instance.gameObject.activeInHierarchy && gameState != GameState.Ended)
             survivalTime = Mathf.Max(0, survivalTime - Time.deltaTime);
         
         if (survivalTime <= 0) EndGame();

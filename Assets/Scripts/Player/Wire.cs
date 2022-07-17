@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Wire : MonoBehaviour
 {
+    public FMODUnity.EventReference sliceSFX;
+    private FMOD.Studio.EventInstance sliceInstance;
 
     Vector2 pivotPos;
     Vector2 diePos;
@@ -21,12 +23,17 @@ public class Wire : MonoBehaviour
             if (!other.CompareTag("Indestructible"))
             {
                 Enemy enemy = other.GetComponent<Enemy>();
-                int damage = enemy.numberOfChips / 2;
+                int damage = Mathf.Max(1, enemy.numberOfChips / 2);
                 
                 enemy.GetDamaged(damage);
+                sliceInstance.start();
             }
 
         }
+    }
+
+    private void OnDestroy() {
+        sliceInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
     }
 
     // Start is called before the first frame update
@@ -34,6 +41,8 @@ public class Wire : MonoBehaviour
     {
         collider = GetComponent<EdgeCollider2D>();
         positions = new List<Vector2>();
+
+        sliceInstance = FMODUnity.RuntimeManager.CreateInstance(sliceSFX);
     }
 
     // Update is called once per frame

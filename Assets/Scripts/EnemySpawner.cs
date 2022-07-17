@@ -28,20 +28,27 @@ public class EnemySpawner : MonoBehaviour
     IEnumerator Spawner(int interval)
     {
         Vector2 point;
-        while (GameManager.Instance.gameState == GameState.Started)
+        while (GameManager.Instance.gameState < GameState.Ended)
         {
-            point = cam.WorldToViewportPoint(transform.position);
-            if (point.x < 0 || point.x > 1 || point.y < 0 && point.y > 1)
+            if (GameManager.Instance.gameState == GameState.Started)
             {
-                Instantiate(
-                    enemies[Random.Range(0,enemies.Length)],
-                    transform.position,
-                    Quaternion.identity,
-                    actors
-                );
+                point = cam.WorldToViewportPoint(transform.position);
+                if (point.x < 0 || point.x > 1 || point.y < 0 && point.y > 1)
+                {
+                    Instantiate(
+                        enemies[Random.Range(0,enemies.Length)],
+                        transform.position,
+                        Quaternion.identity,
+                        actors
+                    );
+                }
+                yield return new WaitForSeconds(interval);
+            }
+            else
+            {
+                yield return null;
             }
 
-            yield return new WaitForSeconds(interval);
         }
     }
 }

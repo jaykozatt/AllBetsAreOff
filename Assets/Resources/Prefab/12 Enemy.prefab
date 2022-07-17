@@ -641,6 +641,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cc4379ca4113714c9f3350049937c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tackleSFX:
+    Guid:
+      Data1: -1315070557
+      Data2: 1079436967
+      Data3: 1504526242
+      Data4: 1057296491
+    Path: event:/SFX/Tackle
+  chipsSFX:
+    Guid:
+      Data1: 356949137
+      Data2: 1241437697
+      Data3: 477946533
+      Data4: 747758962
+    Path: event:/SFX/Chips Falling
   numberOfChips: 12
   scorePerChip: 100
   massPerChip: 2
