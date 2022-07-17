@@ -3,12 +3,12 @@
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
 <g id="Layer_1">
-	<ellipse id="XMLID_2_" style="fill:#DDCD73;" cx="255.724" cy="395.024" rx="78.862" ry="54.065"/>
+	<ellipse id="XMLID_2_" style="fill:#DDCD73;" cx="255.724" cy="381.272" rx="78.862" ry="67.817"/>
 </g>
 <g id="Layer_3">
-	<polygon id="XMLID_1_" style="fill:#DDCD73;" points="177,395 177,100 335,100.024 335,395 	"/>
+	<polygon id="XMLID_1_" style="fill:#DDCD73;" points="177,381 177,114.26 335,114.282 335,381 	"/>
 </g>
 <g id="Layer_2">
-	<ellipse id="XMLID_3_" style="fill:#F4E38E;" cx="255.724" cy="100.024" rx="78.862" ry="54.065"/>
+	<ellipse id="XMLID_3_" style="fill:#F4E38E;" cx="255.724" cy="114.26" rx="78.862" ry="68.301"/>
 </g>
 </svg>

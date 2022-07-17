@@ -50,6 +50,10 @@ public class DiceController : StaticInstance<DiceController>
         {
             flipper = flipper == 1 ? -1 : 1;
             rb.velocity = other.relativeVelocity;
+
+            Enemy enemy;
+            if (other.gameObject.TryGetComponent<Enemy>(out enemy))
+                enemy.GetDamaged(1);
         }
         
     }

@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Enemy : MonoBehaviour
 {
-    public int numberOfChips = 1;
+    [HideInInspector] public int numberOfChips = 1;
     public int scorePerChip = 100;
     public int massPerChip = 2;
     public ParticleSystem toppleFX;
@@ -43,6 +44,7 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        numberOfChips = stack.Where(c => c.gameObject.activeInHierarchy).Count();
         rb.mass = massPerChip * numberOfChips;
         rb.drag = 5;
 
@@ -51,26 +53,20 @@ public class Enemy : MonoBehaviour
 
     public void GetDamaged(int chipsOfDamage)
     {
-        if (numberOfChips > 1)
-        {
-            numberOfChips = Mathf.Max(0, numberOfChips - chipsOfDamage);
-            stack[numberOfChips].gameObject.SetActive(false);
-            GameManager.Instance.AddScore(chipsOfDamage * scorePerChip);
-        }
-        else
-        {
-            GameManager.Instance.AddScore(1 * scorePerChip);
-            Destroy(gameObject);
-        }
-        
         ParticleSystem.EmissionModule emission = toppleFX.emission;
         ParticleSystem.Burst burst = emission.GetBurst(0);
         burst.count = chipsOfDamage;
 
         emission.SetBurst(0, burst);
         
-        toppleFX.transform.position = stack[numberOfChips].transform.position;
+        toppleFX.transform.position = stack[numberOfChips-chipsOfDamage].transform.position;
         toppleFX.Play();
+
+        numberOfChips = Mathf.Max(0, numberOfChips - chipsOfDamage);
+        stack[numberOfChips].gameObject.SetActive(false);
+        GameManager.Instance.AddScore(chipsOfDamage * scorePerChip);
+        
+        if (numberOfChips < 1) Destroy(gameObject);
     }
 
     IEnumerator FollowAI(Transform target)

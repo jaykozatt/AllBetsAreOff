@@ -92,7 +92,10 @@ public class PlayerController : StaticInstance<PlayerController>
                 // targets.RemoveAt(0);
                 DiceController.Instance.Detangle();
                 if (!target.CompareTag("Indestructible"))
-                    Destroy(target.gameObject);
+                {
+                    Enemy enemy = target.GetComponent<Enemy>();
+                    enemy.GetDamaged(enemy.numberOfChips);
+                }
                 
                 targetWasReached = false;
             }
