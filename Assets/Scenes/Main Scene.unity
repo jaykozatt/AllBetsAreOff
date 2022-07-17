@@ -7755,7 +7755,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lives: 3
-  invincibilityFrames: 10
+  invincibilityFrames: 60
   speed: 80
   rb: {fileID: 0}
 --- !u!58 &1554266859
@@ -8348,6 +8348,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   score: 0
+  gameState: 1
   scoreUI: {fileID: 1069314001}
   gameOverDisplay: {fileID: 585249179}
 --- !u!1 &1818499606
@@ -8939,6 +8940,7 @@ MonoBehaviour:
   life1: {fileID: 1229089281}
   life2: {fileID: 535063949}
   life3: {fileID: 804679177}
+  hurtScreen: {fileID: 1325814765}
 --- !u!1 &2141710167
 GameObject:
   m_ObjectHideFlags: 0

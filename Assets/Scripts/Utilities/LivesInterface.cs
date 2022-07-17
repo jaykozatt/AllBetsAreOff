@@ -8,6 +8,8 @@ public class LivesInterface : StaticInstance<LivesInterface>
     public GameObject life2;
     public GameObject life3;
 
+    public GameObject hurtScreen;
+
     public void UpdateDisplay(int lives)
     {
         switch (PlayerController.Instance.lives)
@@ -33,5 +35,18 @@ public class LivesInterface : StaticInstance<LivesInterface>
                 life3.SetActive(false);
                 break;
         }
+    }
+
+    public void HurtFlash()
+    {
+        StartCoroutine(FlashScreenRoutine());
+    }
+
+    IEnumerator FlashScreenRoutine()
+    {
+        hurtScreen.SetActive(true);
+        yield return null;
+        hurtScreen.SetActive(false);
+        
     }
 }

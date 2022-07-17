@@ -64,13 +64,20 @@ public class Enemy : MonoBehaviour
 
         yield return stunTimer;
 
-        while (true)
+        while (GameManager.Instance.gameState != GameState.Ended)
         {
-            direction = (target.position - transform.position).normalized;
+            if (GameManager.Instance.gameState == GameState.Paused)
+            {
+                yield return null;
+            }
+            else
+            {
+                direction = (target.position - transform.position).normalized;
 
-            rb.AddForce(rb.mass * direction * speed, ForceMode2D.Impulse);
+                rb.AddForce(rb.mass * direction * speed, ForceMode2D.Impulse);
 
-            yield return new WaitForSeconds(Random.Range(3,5));
+                yield return new WaitForSeconds(Random.Range(3,5));
+            }
         }
     }
 }

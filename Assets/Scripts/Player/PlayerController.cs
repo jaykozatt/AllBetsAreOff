@@ -37,6 +37,14 @@ public class PlayerController : StaticInstance<PlayerController>
     // Update is called once per frame
     void Update()
     {
+        if (GameManager.Instance.gameState == GameState.Started)
+            ProcessInput();        
+
+        framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - 1);
+    }
+
+    void ProcessInput()
+    {
         input.x = Input.GetAxis("Horizontal");
         input.y = Input.GetAxis("Vertical");
 
@@ -62,8 +70,6 @@ public class PlayerController : StaticInstance<PlayerController>
                 reelCrash = StartCoroutine(ReelCrash());
             }
         }
-
-        framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - 1);
     }
 
     IEnumerator ReelCrash()
@@ -103,6 +109,7 @@ public class PlayerController : StaticInstance<PlayerController>
             lives = Mathf.Max(0, lives - 1);
             framesUntilVulnerable = invincibilityFrames;
             LivesInterface.Instance.UpdateDisplay(lives);
+            LivesInterface.Instance.HurtFlash();
 
             if (lives <= 0) GameManager.Instance.LoseGame();
         }

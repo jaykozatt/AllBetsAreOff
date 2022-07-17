@@ -4,13 +4,13 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 
+public enum GameState {None, Started, Paused, Ended}
 public class GameManager : StaticInstance<GameManager>
 {
-    enum GameState {None, Started, Ended}
 
 
     [SerializeField] int score = 0;
-    GameState gameState = GameState.None;
+    public GameState gameState = GameState.Started;
 
     public TextMeshProUGUI scoreUI;
     
@@ -41,5 +41,6 @@ public class GameManager : StaticInstance<GameManager>
     public void LoseGame()
     {
         gameOverDisplay.SetActive(true);
+        gameState = GameState.Ended;
     }
 }
