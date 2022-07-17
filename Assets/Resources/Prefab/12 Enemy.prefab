@@ -655,6 +655,13 @@ MonoBehaviour:
       Data3: 477946533
       Data4: 747758962
     Path: event:/SFX/Chips Falling
+  slideSFX:
+    Guid:
+      Data1: -107526059
+      Data2: 1156728730
+      Data3: 467815868
+      Data4: 721834609
+    Path: event:/SFX/Sliding
   numberOfChips: 12
   scorePerChip: 100
   massPerChip: 2

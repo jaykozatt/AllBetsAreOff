@@ -11,6 +11,10 @@ public class Enemy : MonoBehaviour
     public FMODUnity.EventReference chipsSFX;
     private FMOD.Studio.EventInstance chipsInstance;
 
+    public FMODUnity.EventReference slideSFX;
+    private FMOD.Studio.EventInstance slideInstance;
+    
+
     [HideInInspector] public int numberOfChips = 1;
     public int scorePerChip = 100;
     public int massPerChip = 2;
@@ -41,6 +45,7 @@ public class Enemy : MonoBehaviour
         StopCoroutine(followAI);
         tackleInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         chipsInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        slideInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
     }
 
     private void Awake() 
@@ -63,6 +68,7 @@ public class Enemy : MonoBehaviour
 
         tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
         chipsInstance = FMODUnity.RuntimeManager.CreateInstance(chipsSFX);
+        slideInstance = FMODUnity.RuntimeManager.CreateInstance(slideSFX);
 
         followAI = StartCoroutine(FollowAI(PlayerController.Instance.transform));
     }
@@ -105,6 +111,7 @@ public class Enemy : MonoBehaviour
                 direction = (target.position - transform.position).normalized;
 
                 rb.AddForce(rb.mass * direction * speed, ForceMode2D.Impulse);
+                slideInstance.start();
 
                 yield return new WaitForSeconds(Random.Range(3,5));
             }
