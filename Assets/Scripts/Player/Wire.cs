@@ -14,21 +14,23 @@ public class Wire : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other) 
     {
-        if (!other.CompareTag("Untagged"))
+        if (DiceController.Instance.IsDeployed)
         {
-            DiceController.Instance.TangleWireTo(other);
-        }
-        else
-        {
-            if (!other.CompareTag("Indestructible"))
+            if (!other.CompareTag("Untagged"))
             {
-                Enemy enemy = other.GetComponent<Enemy>();
-                int damage = Mathf.Max(1, enemy.numberOfChips / 2);
-                
-                enemy.GetDamaged(damage);
-                sliceInstance.start();
+                DiceController.Instance.TangleWireTo(other);
             }
-
+            else
+            {
+                if (!other.CompareTag("Indestructible"))
+                {
+                    Enemy enemy = other.GetComponent<Enemy>();
+                    int damage = Mathf.Max(1, enemy.numberOfChips / 2);
+                    
+                    enemy.GetDamaged(damage);
+                    sliceInstance.start();
+                }
+            }
         }
     }
 

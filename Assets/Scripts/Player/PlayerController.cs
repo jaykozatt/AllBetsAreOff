@@ -27,8 +27,18 @@ public class PlayerController : StaticInstance<PlayerController>
         int defaultLayer = LayerMask.NameToLayer("Default");
         if (isReeling && other.collider.gameObject.layer == defaultLayer)
         {
-            targetWasReached = true;
-            tackleInstance.start();
+            bool otherIsEntangled = targets.Contains(other.transform);
+            if (!otherIsEntangled && !other.gameObject.CompareTag("Indestructible"))
+            {
+                Enemy enemy = other.gameObject.GetComponent<Enemy>();
+                enemy.GetDamaged(enemy.numberOfChips);
+                tackleInstance.start();
+            }
+            else if (otherIsEntangled)
+            {
+                targetWasReached = true;
+                tackleInstance.start();
+            }
         }
     }
 
@@ -48,7 +58,7 @@ public class PlayerController : StaticInstance<PlayerController>
     {
         if (GameManager.Instance.gameState == GameState.Started)
             ProcessInput();        
-        print (rb.velocity.magnitude);
+
         framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - 1);
     }
 
@@ -129,7 +139,7 @@ public class PlayerController : StaticInstance<PlayerController>
 
             if (lives <= 0) 
             {
-                GameManager.Instance.EndGame();
+                GameManager.Instance.LoseGame();
                 Destroy(transform.parent.gameObject);
             }
         }

@@ -20,9 +20,11 @@ public class Enemy : MonoBehaviour
     public int massPerChip = 2;
     public ParticleSystem toppleFX;
     public List<SpriteRenderer> stack;
+    public Color alertColor;
 
     public float speed = 5;
     public int minimumDistance = 1;
+    public bool isAttacking = false;
 
     public Rigidbody2D rb;
     // private WaitForSeconds moveTimer = new WaitForSeconds(5);
@@ -33,7 +35,7 @@ public class Enemy : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other) 
     {
-        if (other.collider.CompareTag("Player"))
+        if (other.collider.CompareTag("Player") && this.isAttacking)
         {
             PlayerController.Instance.GetHurt();
             tackleInstance.start();
@@ -52,6 +54,7 @@ public class Enemy : MonoBehaviour
     {
         rb = GetComponentInChildren<Rigidbody2D>();
         GetComponentsInChildren<SpriteRenderer>(stack);
+        stack.RemoveAt(stack.Count-1);
 
         string particlesPath = "/Managers/ParticleSystems/";
         string topplePath = particlesPath + (CompareTag("Tough") ? "Purple Enemy" : "Blue Enemy");
@@ -73,6 +76,11 @@ public class Enemy : MonoBehaviour
         followAI = StartCoroutine(FollowAI(PlayerController.Instance.transform));
     }
 
+    void Update() 
+    {
+        if (rb.velocity.sqrMagnitude <= 1) isAttacking = false;
+    }
+
     public void GetDamaged(int chipsOfDamage)
     {
         ParticleSystem.EmissionModule emission = toppleFX.emission;
@@ -91,7 +99,7 @@ public class Enemy : MonoBehaviour
         chipsInstance.setParameterByName("Number of chips", chipsOfDamage);
         chipsInstance.start();
         
-        if (numberOfChips < 1) Destroy(gameObject);
+        if (numberOfChips < 1 && gameObject != null) Destroy(gameObject);
     }
 
     IEnumerator FollowAI(Transform target)
@@ -100,6 +108,8 @@ public class Enemy : MonoBehaviour
 
         yield return stunTimer;
 
+        WaitForSeconds waitQuarterSecond = new WaitForSeconds(.15f);
+        WaitForSeconds waitHalfSecond = new WaitForSeconds(.4f);
         while (GameManager.Instance.gameState < GameState.Ended)
         {
             if (GameManager.Instance.gameState == GameState.Paused)
@@ -108,12 +118,25 @@ public class Enemy : MonoBehaviour
             }
             else
             {
+                for (int i = 1; i<= 2; i++)
+                {
+                    foreach (SpriteRenderer sprite in stack)
+                        sprite.color = alertColor;
+                    yield return waitQuarterSecond;
+
+                    foreach (SpriteRenderer sprite in stack)
+                        sprite.color = Color.white;
+                    yield return waitQuarterSecond;
+                }
+                yield return waitHalfSecond;
+
                 direction = (target.position - transform.position).normalized;
 
                 rb.AddForce(rb.mass * direction * speed, ForceMode2D.Impulse);
+                isAttacking = true;
                 slideInstance.start();
 
-                yield return new WaitForSeconds(Random.Range(3,5));
+                yield return new WaitForSeconds(Random.Range(2,5));
             }
         }
     }

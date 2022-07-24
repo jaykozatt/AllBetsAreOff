@@ -39,6 +39,9 @@ public class DiceController : StaticInstance<DiceController>
     public bool IsTangled {
         get => isTangled;
     }
+    public bool IsDeployed {
+        get => this.enabled;
+    }
     public int CurrentDice {
         get => diceNumber + 1;
     }

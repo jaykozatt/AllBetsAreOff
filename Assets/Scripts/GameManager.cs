@@ -5,7 +5,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public enum GameState {Paused, Started, Ended}
+public enum GameState {Started, Paused, Ended}
 public class GameManager : StaticInstance<GameManager>
 {
 
@@ -19,24 +19,26 @@ public class GameManager : StaticInstance<GameManager>
     public TextMeshProUGUI timerUI;
     
     public GameObject gameOverDisplay;
+    public GameObject youWinDisplay;
+    public GameObject gameUI;
 
     // Start is called before the first frame update
     void Start()
     {
-        scoreUI.text = $"Score: 0";
+        scoreUI.text = $"0";
         timerUI.text = "00:00";
     }
 
     // Update is called once per frame
     void Update()
     {
-        scoreUI.text = $"Score: {score}";
+        scoreUI.text = $"{score}";
         timerUI.text = string.Format("{00}:{1:00}", (int)survivalTime / 60, (int)survivalTime % 60);
     
-        if (!MissionText.Instance.gameObject.activeInHierarchy && gameState != GameState.Ended)
+        if (gameState < GameState.Paused)
             survivalTime = Mathf.Max(0, survivalTime - Time.deltaTime);
         
-        if (survivalTime <= 0) EndGame();
+        if (survivalTime <= 0) LoseGame();
     }
 
     public void AddScore(int points)
@@ -49,9 +51,25 @@ public class GameManager : StaticInstance<GameManager>
         SceneManager.LoadScene(0);
     }
 
-    public void EndGame()
+    public void BeginGame()
     {
+        gameUI.SetActive(true);
+        gameState = GameState.Started;
+    }
+
+    public void WinGame()
+    {
+        gameUI.SetActive(false);
+        youWinDisplay.SetActive(true);
+        youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
+        gameState = GameState.Ended;
+    }
+
+    public void LoseGame()
+    {
+        gameUI.SetActive(false);
         gameOverDisplay.SetActive(true);
+        gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
         gameState = GameState.Ended;
     }
 }
