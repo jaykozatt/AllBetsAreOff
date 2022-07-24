@@ -664,7 +664,7 @@ MonoBehaviour:
     Path: event:/SFX/Sliding
   numberOfChips: 12
   scorePerChip: 100
-  massPerChip: 50
+  massPerChip: 2
   toppleFX: {fileID: 0}
   stack: []
   alertColor: {r: 0.97890884, g: 0.9811321, b: 0.754361, a: 1}

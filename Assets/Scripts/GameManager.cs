@@ -62,6 +62,8 @@ public class GameManager : StaticInstance<GameManager>
         gameUI.SetActive(false);
         youWinDisplay.SetActive(true);
         youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
+        youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[3].text = 
+            string.Format("{00}:{1:00}", (int)survivalTime / 60, (int)survivalTime % 60);
         gameState = GameState.Ended;
     }
 
@@ -70,6 +72,8 @@ public class GameManager : StaticInstance<GameManager>
         gameUI.SetActive(false);
         gameOverDisplay.SetActive(true);
         gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
+        gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[3].text = 
+            string.Format("{00}:{1:00}", (int)survivalTime / 60, (int)survivalTime % 60);
         gameState = GameState.Ended;
     }
 }
