@@ -27,7 +27,8 @@ public class PlayerController : StaticInstance<PlayerController>
         int defaultLayer = LayerMask.NameToLayer("Default");
         if (isReeling && other.collider.gameObject.layer == defaultLayer)
         {
-            bool otherIsEntangled = targets.Contains(other.transform);
+            targets = DiceController.Instance.GetTangledPoints();
+            bool otherIsEntangled = targets[0] == other.transform;
             if (!otherIsEntangled && !other.gameObject.CompareTag("Indestructible"))
             {
                 Enemy enemy = other.gameObject.GetComponent<Enemy>();
@@ -42,7 +43,21 @@ public class PlayerController : StaticInstance<PlayerController>
         }
     }
 
+    private void OnCollisionStay2D(Collision2D other) 
+    {
+        int defaultLayer = LayerMask.NameToLayer("Default");
+        if (other.collider.gameObject.layer == defaultLayer)
+        {
+            targets = DiceController.Instance.GetTangledPoints();
+            if (targets.Count > 0 && targets[0] == other.transform)
+            {
+                targetWasReached = true;
+            }
+        }
+    }
+
     private void OnDestroy() {
+        if (reelCrash != null) StopCoroutine(reelCrash);
         tackleInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
     }
 
@@ -51,6 +66,7 @@ public class PlayerController : StaticInstance<PlayerController>
     {
         rb = GetComponent<Rigidbody2D>();
         tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
+        targets = new List<Transform>();
     }
 
     // Update is called once per frame
@@ -84,18 +100,24 @@ public class PlayerController : StaticInstance<PlayerController>
         {
             if (!isReeling && (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)))
             {
-                targets = DiceController.Instance.GetTangledPoints();
                 isReeling = true;
                 reelCrash = StartCoroutine(ReelCrash());
+            }
+            else if (!isReeling && targetWasReached)
+            {
+                DiceController.Instance.Detangle();
+                targetWasReached = false;
             }
         }
     }
 
     IEnumerator ReelCrash()
     {
+        targets = DiceController.Instance.GetTangledPoints();
+
         Vector2 attackVector;
         Transform target;
-        while (targets.Count > 0)
+        while (DiceController.Instance.IsTangled)
         {
             target = targets[0];
             attackVector = (target.position - transform.position).normalized;
@@ -106,9 +128,9 @@ public class PlayerController : StaticInstance<PlayerController>
             
             if (targetWasReached)
             {
+                targets = DiceController.Instance.GetTangledPoints();
                 target = targets[0];
 
-                // targets.RemoveAt(0);
                 DiceController.Instance.Detangle();
                 if (!target.CompareTag("Indestructible"))
                 {

@@ -22,7 +22,6 @@ public class DiceController : StaticInstance<DiceController>
     public float velocity = 1;
     public float lengthRate = 1;
     public Transform pivot;
-    private bool isTangled = false;
     private bool isDeploying = false;
     private int flipper = 1;
     private int diceNumber = 0;
@@ -37,7 +36,7 @@ public class DiceController : StaticInstance<DiceController>
         get => PlayerController.Instance;
     }
     public bool IsTangled {
-        get => isTangled;
+        get => pointsTangled.Count > 0;
     }
     public bool IsDeployed {
         get => this.enabled;
@@ -48,7 +47,7 @@ public class DiceController : StaticInstance<DiceController>
 
     private void OnCollisionEnter2D(Collision2D other) 
     {
-        if (other.collider.CompareTag("Player") && !isDeploying && !isTangled)
+        if (other.collider.CompareTag("Player") && !isDeploying && !IsTangled)
         {
             this.enabled = false;
         }
@@ -68,7 +67,7 @@ public class DiceController : StaticInstance<DiceController>
 
     private void OnCollisionStay2D(Collision2D other) 
     {
-        if (other.collider.CompareTag("Player") && !isDeploying && !isTangled)
+        if (other.collider.CompareTag("Player") && !isDeploying && !IsTangled)
         {
             this.enabled = false;
         }
@@ -122,10 +121,19 @@ public class DiceController : StaticInstance<DiceController>
     // Update is called once per frame
     void Update()
     {
+        CheckPivot();
         SwingDie();
         DrawWire();
     }
 
+    void CheckPivot()
+    {
+        if (pivot == null || joint.connectedBody == null)
+        {
+            pivot = PlayerController.Instance.transform;
+            joint.connectedBody = PlayerController.Instance.rb;
+        }
+    }
     void SwingDie()
     {
         LayerMask mask = LayerMask.GetMask("Default");
@@ -149,7 +157,6 @@ public class DiceController : StaticInstance<DiceController>
             joint.connectedBody = other.attachedRigidbody;
             joint.distance = ((Vector2)(transform.position - other.transform.position)).magnitude;
             pointsTangled.Add(other.transform);
-            isTangled = true;
         }
     }
 
@@ -160,7 +167,6 @@ public class DiceController : StaticInstance<DiceController>
         {
             pivot = Player.transform;
             joint.connectedBody = Player.rb;
-            isTangled = false;
         }
     }
 

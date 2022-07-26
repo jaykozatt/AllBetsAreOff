@@ -130,6 +130,8 @@ public class Enemy : MonoBehaviour
                 }
                 yield return waitHalfSecond;
 
+                if (target == null) continue;
+
                 direction = (target.position - transform.position).normalized;
 
                 rb.AddForce(rb.mass * direction * speed, ForceMode2D.Impulse);

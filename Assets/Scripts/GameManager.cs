@@ -38,7 +38,7 @@ public class GameManager : StaticInstance<GameManager>
         if (gameState < GameState.Paused)
             survivalTime = Mathf.Max(0, survivalTime - Time.deltaTime);
         
-        if (survivalTime <= 0) LoseGame();
+        if (survivalTime <= 0) WinGame();
     }
 
     public void AddScore(int points)
