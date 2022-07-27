@@ -5,21 +5,20 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public enum GameState {Started, Paused, Ended}
+public enum GameState {Initialized, Playing, Paused, Ended}
 public class GameManager : StaticInstance<GameManager>
 {
-
-    
     [SerializeField] int score = 0;
     public float survivalTime;
     private TimeSpan timespan;
-    public GameState gameState = GameState.Started;
+    public GameState gameState = GameState.Initialized;
 
     public TextMeshProUGUI scoreUI;
     public TextMeshProUGUI timerUI;
     
     public GameObject gameOverDisplay;
     public GameObject youWinDisplay;
+    public GameObject pauseDisplay;
     public GameObject gameUI;
 
     // Start is called before the first frame update
@@ -27,6 +26,7 @@ public class GameManager : StaticInstance<GameManager>
     {
         scoreUI.text = $"0";
         timerUI.text = "00:00";
+        gameState = GameState.Initialized;
     }
 
     // Update is called once per frame
@@ -35,7 +35,9 @@ public class GameManager : StaticInstance<GameManager>
         scoreUI.text = $"{score}";
         timerUI.text = string.Format("{00}:{1:00}", (int)survivalTime / 60, (int)survivalTime % 60);
     
-        if (gameState < GameState.Paused)
+        FMODUnity.RuntimeManager.StudioSystem.setParameterByName("Game State", (float) gameState);
+
+        if (gameState == GameState.Playing)
             survivalTime = Mathf.Max(0, survivalTime - Time.deltaTime);
         
         if (survivalTime <= 0) WinGame();
@@ -53,8 +55,26 @@ public class GameManager : StaticInstance<GameManager>
 
     public void BeginGame()
     {
-        gameUI.SetActive(true);
-        gameState = GameState.Started;
+        // gameUI.SetActive(true);
+        gameState = GameState.Playing;
+    }
+
+    public void EnableGUI() => gameUI.SetActive(true);
+
+    public void PauseGame()
+    {
+        gameState = GameState.Paused;
+        Time.timeScale = 0;
+        pauseDisplay.SetActive(true);
+        // gameUI.SetActive(false);
+    }
+
+    public void ResumeGame()
+    {
+        gameState = GameState.Playing;
+        Time.timeScale = 1;
+        pauseDisplay.SetActive(false);
+        // gameUI.SetActive(true);
     }
 
     public void WinGame()

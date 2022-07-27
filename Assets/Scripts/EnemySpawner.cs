@@ -30,7 +30,7 @@ public class EnemySpawner : MonoBehaviour
         Vector2 point;
         while (GameManager.Instance.gameState < GameState.Ended)
         {
-            if (GameManager.Instance.gameState == GameState.Started)
+            if (GameManager.Instance.gameState == GameState.Playing)
             {
                 point = cam.WorldToViewportPoint(transform.position);
                 if (point.x < 0 || point.x > 1 || point.y < 0 && point.y > 1)

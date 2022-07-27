@@ -28,17 +28,16 @@ public class Enemy : MonoBehaviour
 
     public Rigidbody2D rb;
     // private WaitForSeconds moveTimer = new WaitForSeconds(5);
-    private WaitForSeconds stunTimer = new WaitForSeconds(5);
+    private WaitForSeconds stunTimer = new WaitForSeconds(2);
 
     Coroutine followAI;
 
 
     private void OnCollisionEnter2D(Collision2D other) 
     {
-        if (other.collider.CompareTag("Player") && this.isAttacking)
+        if (other.collider.CompareTag("Player"))
         {
             PlayerController.Instance.GetHurt();
-            tackleInstance.start();
         }
     }
 
@@ -48,6 +47,8 @@ public class Enemy : MonoBehaviour
         tackleInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         chipsInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         slideInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+
+        DiceController.Instance.TryDetangle(transform);
     }
 
     private void Awake() 
@@ -89,10 +90,14 @@ public class Enemy : MonoBehaviour
 
         emission.SetBurst(0, burst);
         
-        toppleFX.transform.position = stack[numberOfChips-chipsOfDamage].transform.position;
+        int difference = numberOfChips-chipsOfDamage;
+        if (difference < 0)
+            toppleFX.transform.position = transform.position;
+        else
+            toppleFX.transform.position = stack[difference].transform.position;
         toppleFX.Play();
 
-        numberOfChips = Mathf.Max(0, numberOfChips - chipsOfDamage);
+        numberOfChips = Mathf.Max(0, difference);
         stack[numberOfChips].gameObject.SetActive(false);
         GameManager.Instance.AddScore(chipsOfDamage * scorePerChip);
 
@@ -106,18 +111,18 @@ public class Enemy : MonoBehaviour
     {
         Vector2 direction;
 
-        yield return stunTimer;
-
         WaitForSeconds waitQuarterSecond = new WaitForSeconds(.15f);
         WaitForSeconds waitHalfSecond = new WaitForSeconds(.4f);
         while (GameManager.Instance.gameState < GameState.Ended)
         {
-            if (GameManager.Instance.gameState == GameState.Paused)
+            if (GameManager.Instance.gameState != GameState.Playing)
             {
                 yield return null;
             }
             else
             {
+                yield return new WaitForSeconds(Random.Range(2,5));
+
                 for (int i = 1; i<= 2; i++)
                 {
                     foreach (SpriteRenderer sprite in stack)
@@ -137,8 +142,6 @@ public class Enemy : MonoBehaviour
                 rb.AddForce(rb.mass * direction * speed, ForceMode2D.Impulse);
                 isAttacking = true;
                 slideInstance.start();
-
-                yield return new WaitForSeconds(Random.Range(2,5));
             }
         }
     }

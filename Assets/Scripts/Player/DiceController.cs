@@ -53,7 +53,7 @@ public class DiceController : StaticInstance<DiceController>
         }
         else if (!other.collider.CompareTag("Player"))
         {
-            flipper = flipper == 1 ? -1 : 1;
+            // flipper = flipper == 1 ? -1 : 1;
             rb.velocity = other.relativeVelocity;
 
             Enemy enemy;
@@ -145,6 +145,8 @@ public class DiceController : StaticInstance<DiceController>
             Vector2 direction = -radius.normalized;
             (direction.x, direction.y) = (direction.y, -direction.x);
 
+            flipper = Vector3.Cross(rb.velocity,radius).z > 0 ? -1 : 1;
+
             rb.AddForce(rb.mass * (flipper*direction - radius).normalized / radius.magnitude * velocity * velocity);
         }
     }
@@ -168,6 +170,24 @@ public class DiceController : StaticInstance<DiceController>
             pivot = Player.transform;
             joint.connectedBody = Player.rb;
         }
+    }
+
+    public bool TryDetangle(Transform point)
+    {
+        if (pointsTangled.Contains(point))
+        {
+            pointsTangled.Remove(point);
+            
+            if (pointsTangled.Count <= 0) 
+            {
+                pivot = Player.transform;
+                joint.connectedBody = Player.rb;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     void DrawWire()

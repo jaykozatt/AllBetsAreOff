@@ -9,6 +9,7 @@ public class LivesInterface : StaticInstance<LivesInterface>
     public GameObject life3;
 
     public GameObject hurtScreen;
+    public int framesOfFlash = 2;
 
     public void UpdateDisplay(int lives)
     {
@@ -45,8 +46,8 @@ public class LivesInterface : StaticInstance<LivesInterface>
     IEnumerator FlashScreenRoutine()
     {
         hurtScreen.SetActive(true);
-        yield return null;
-        yield return null;
+        for (int i = 0; i < framesOfFlash; i++)
+            yield return null;
         hurtScreen.SetActive(false);
         
     }

@@ -59,6 +59,7 @@ public class MissionText : StaticInstance<MissionText>
         StartCoroutine(FadeOut(titleGroup));
         while (isFading) yield return null;
 
+        GameManager.Instance.BeginGame();
         StartCoroutine(FadeIn(missionGroup));
         while (isFading) yield return null;
         yield return new WaitForSeconds(2);
@@ -66,7 +67,8 @@ public class MissionText : StaticInstance<MissionText>
         StartCoroutine(FadeOut(missionGroup));
         while (isFading) yield return null;
 
-        GameManager.Instance.BeginGame();
+        GameManager.Instance.EnableGUI();
+
     }
 
     IEnumerator FadeIn(CanvasGroup group)
