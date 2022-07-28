@@ -197,7 +197,7 @@ public class PlayerController : StaticInstance<PlayerController>
         }
 
         float radius = hurtbox.radius;
-        hurtbox.radius = 2* radius;
+        hurtbox.radius = 1.5f* radius;
         yield return null;
 
         while (rb.velocity.magnitude > 10)
