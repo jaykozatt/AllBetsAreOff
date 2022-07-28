@@ -48,7 +48,8 @@ public class Enemy : MonoBehaviour
         chipsInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         slideInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
 
-        DiceController.Instance.TryDetangle(transform);
+        if (DiceController.Instance != null)
+            DiceController.Instance.TryDetangle(transform);
     }
 
     private void Awake() 
