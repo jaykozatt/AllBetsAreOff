@@ -81,7 +81,7 @@ public class Enemy : MonoBehaviour
     void Update() 
     {
         if (rb.velocity.sqrMagnitude <= 1) isAttacking = false;
-        if (PlayerController.Instance == null) StopCoroutine(followAI);
+        if (GameManager.Instance.gameState == GameState.Ended) StopCoroutine(followAI);
     }
 
     public void GetDamaged(int chipsOfDamage)

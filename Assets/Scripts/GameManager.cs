@@ -8,9 +8,19 @@ using UnityEngine.SceneManagement;
 public enum GameState {Initialized, Playing, Paused, Ended}
 public class GameManager : StaticInstance<GameManager>
 {
+    [Serializable]
+    public struct TimeSpan {
+        public int minutes;
+        public int seconds;
+        public TimeSpan(int minutes, int seconds) {
+            this.minutes = minutes; this.seconds = seconds;
+        }
+        public int totalSeconds {get=>60*minutes+seconds;}
+    }
+
     [SerializeField] int score = 0;
-    public float survivalTime;
-    private TimeSpan timespan;
+    public TimeSpan survivalTime;
+    private float timer;
     public GameState gameState = GameState.Initialized;
 
     public TextMeshProUGUI scoreUI;
@@ -27,20 +37,21 @@ public class GameManager : StaticInstance<GameManager>
         scoreUI.text = $"0";
         timerUI.text = "00:00";
         gameState = GameState.Initialized;
+        timer = survivalTime.totalSeconds;
     }
 
     // Update is called once per frame
     void Update()
     {
         scoreUI.text = $"{score}";
-        timerUI.text = string.Format("{00}:{1:00}", (int)survivalTime / 60, (int)survivalTime % 60);
+        timerUI.text = string.Format("{00}:{1:00}", (int)timer / 60, (int)timer % 60);
     
         FMODUnity.RuntimeManager.StudioSystem.setParameterByName("Game State", (float) gameState);
 
         if (gameState == GameState.Playing)
-            survivalTime = Mathf.Max(0, survivalTime - Time.deltaTime);
+            timer = Mathf.Max(0, timer - Time.deltaTime);
         
-        if (survivalTime <= 0) WinGame();
+        if (timer <= 0) WinGame();
     }
 
     public void AddScore(int points)
@@ -83,7 +94,7 @@ public class GameManager : StaticInstance<GameManager>
         youWinDisplay.SetActive(true);
         youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
         youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[3].text = 
-            string.Format("{00}:{1:00}", (int)survivalTime / 60, (int)survivalTime % 60);
+            string.Format("{00}:{1:00}", (int)timer / 60, (int)timer % 60);
         gameState = GameState.Ended;
     }
 
@@ -93,7 +104,7 @@ public class GameManager : StaticInstance<GameManager>
         gameOverDisplay.SetActive(true);
         gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
         gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[3].text = 
-            string.Format("{00}:{1:00}", (int)survivalTime / 60, (int)survivalTime % 60);
+            string.Format("{00}:{1:00}", (int)timer / 60, (int)timer % 60);
         gameState = GameState.Ended;
     }
 }

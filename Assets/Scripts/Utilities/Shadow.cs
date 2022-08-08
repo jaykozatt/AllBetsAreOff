@@ -5,7 +5,13 @@ using UnityEngine;
 public class Shadow : MonoBehaviour
 {
     public Transform caster;
+    internal SpriteRenderer sprite;
     Vector3 offset;
+
+    void Awake() 
+    {
+        sprite = GetComponent<SpriteRenderer>();
+    }
 
     // Start is called before the first frame update
     void Start()

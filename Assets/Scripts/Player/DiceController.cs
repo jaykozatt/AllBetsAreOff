@@ -76,14 +76,15 @@ public class DiceController : StaticInstance<DiceController>
         renderer.enabled = true;
         collider.enabled = true;
         line.enabled = true;
-        shadow.gameObject.SetActive(true);    
+        shadow.sprite.enabled = true;    
+        DrawWire();
     }
 
     private void OnDisable() {
         renderer.enabled = false;
         collider.enabled = false;
         line.enabled = false;
-        shadow.gameObject.SetActive(false);
+        shadow.sprite.enabled = false;
     }
 
     private void OnDestroy() 

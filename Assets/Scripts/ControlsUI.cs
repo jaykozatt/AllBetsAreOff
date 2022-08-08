@@ -12,8 +12,8 @@ public class ControlsUI : StaticInstance<ControlsUI>
     public TextMeshProUGUI space;
     public Image spaceKey;
 
-    Color normalColor = new Color(248,244,235);
-    Color highlight = Color.yellow;
+    public Color normalColor;
+    public Color highlight; // EAB543
 
     DiceController dice;
 
