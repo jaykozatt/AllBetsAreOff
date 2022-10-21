@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class MissionText : StaticInstance<MissionText>
 {
@@ -59,7 +60,7 @@ public class MissionText : StaticInstance<MissionText>
 
         StartCoroutine(FadeIn(missionGroup));
         while (isFading) yield return null;
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(secondsUntilFade);
 
         StartCoroutine(FadeOut(missionGroup));
         while (isFading) yield return null;
