@@ -17778,7 +17778,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 578303598}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.354405, y: -9.350982, z: -10}
+  m_LocalPosition: {x: 0.35440493, y: -9.350982, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 330245006}
@@ -19959,7 +19959,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1028014533}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.354405, y: -9.350982, z: -10}
+  m_LocalPosition: {x: 0.35440493, y: -9.350982, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 868236136}
@@ -23477,7 +23477,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1603652703}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.2794046, y: -8.420981, z: -18}
+  m_LocalPosition: {x: 1.2794042, y: -8.420981, z: -18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 209710886}
@@ -24812,8 +24812,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb734fc0f31f710438af7526e61438e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadingRate: 1
-  secondsUntilFade: 3
+  fadingRate: 2
+  secondsUntilFade: 1
   titleGroup: {fileID: 646052545}
   missionGroup: {fileID: 913430930}
   pressAnyKeyText: {fileID: 1085567150}
@@ -25063,7 +25063,7 @@ MonoBehaviour:
     minutes: 5
     seconds: 0
   gameState: 0
-  timeUntilComboReset: 5
+  timeUntilComboReset: 3
   maxMultiplier: 6
   scoreUI: {fileID: 1069314001}
   timerUI: {fileID: 1209652268}
