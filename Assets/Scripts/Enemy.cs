@@ -27,11 +27,11 @@ public class Enemy : MonoBehaviour
     public bool isAttacking = false;
 
     public Rigidbody2D rb;
+    public TextPopup popup;
     // private WaitForSeconds moveTimer = new WaitForSeconds(5);
     private WaitForSeconds stunTimer = new WaitForSeconds(2);
 
     Coroutine followAI;
-
 
     private void OnCollisionEnter2D(Collision2D other) 
     {
@@ -86,6 +86,7 @@ public class Enemy : MonoBehaviour
 
     public void GetDamaged(int chipsOfDamage)
     {
+        TextPopup instance = Instantiate(popup, transform.position, Quaternion.identity);
         ParticleSystem.EmissionModule emission = toppleFX.emission;
         ParticleSystem.Burst burst = emission.GetBurst(0);
         burst.count = chipsOfDamage;
@@ -101,12 +102,16 @@ public class Enemy : MonoBehaviour
 
         numberOfChips = Mathf.Max(0, difference);
         stack[numberOfChips].gameObject.SetActive(false);
-        GameManager.Instance.AddScore(chipsOfDamage * scorePerChip);
+        GameManager.Instance.AddScore(chipsOfDamage * scorePerChip, instance);
 
         chipsInstance.setParameterByName("Number of chips", chipsOfDamage);
         chipsInstance.start();
-        
-        if (numberOfChips < 1 && gameObject != null) Destroy(gameObject);
+
+        if (numberOfChips < 1 && gameObject != null) 
+        {
+            GameManager.Instance.IncreaseCombo();
+            Destroy(gameObject);
+        }    
     }
 
     IEnumerator FollowAI(Transform target)

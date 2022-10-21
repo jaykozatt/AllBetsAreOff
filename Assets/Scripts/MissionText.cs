@@ -11,7 +11,6 @@ public class MissionText : StaticInstance<MissionText>
     public CanvasGroup titleGroup;
     public CanvasGroup missionGroup;
     public TextMeshProUGUI pressAnyKeyText;
-    public Image fmod;
 
     Coroutine mainTitleRoutine;
 
@@ -25,7 +24,6 @@ public class MissionText : StaticInstance<MissionText>
         base.Awake();
         titleGroup = GetComponentInChildren<CanvasGroup>();
         // pressAnyKeyText = GetComponentsInChildren<TextMeshProUGUI>()[1];
-        fmod = GetComponentInChildren<Image>();
     }
 
     private void Start() {
@@ -49,7 +47,7 @@ public class MissionText : StaticInstance<MissionText>
     {
         Coroutine flasher = StartCoroutine(Flasher(pressAnyKeyText));
 
-        while (!Input.anyKeyDown)
+        while (!Input.anyKeyDown && Input.touchCount == 0)
         {
             yield return null;
 
@@ -59,7 +57,6 @@ public class MissionText : StaticInstance<MissionText>
         StartCoroutine(FadeOut(titleGroup));
         while (isFading) yield return null;
 
-        GameManager.Instance.BeginGame();
         StartCoroutine(FadeIn(missionGroup));
         while (isFading) yield return null;
         yield return new WaitForSeconds(2);
@@ -68,6 +65,7 @@ public class MissionText : StaticInstance<MissionText>
         while (isFading) yield return null;
 
         GameManager.Instance.EnableGUI();
+        GameManager.Instance.BeginGame();
 
     }
 

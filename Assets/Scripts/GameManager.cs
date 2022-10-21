@@ -22,14 +22,21 @@ public class GameManager : StaticInstance<GameManager>
     public TimeSpan survivalTime;
     private float timer;
     public GameState gameState = GameState.Initialized;
+    public float timeUntilComboReset = 5;
+    public float comboTimer {get; private set;}
+
+    [SerializeField] int maxMultiplier = 6;
+    private int comboMultiplier = 1;
 
     public TextMeshProUGUI scoreUI;
     public TextMeshProUGUI timerUI;
-    
+
     public GameObject gameOverDisplay;
     public GameObject youWinDisplay;
     public GameObject pauseDisplay;
     public GameObject gameUI;
+
+    public Action<int> OnComboUpdate;
 
     // Start is called before the first frame update
     void Start()
@@ -38,6 +45,7 @@ public class GameManager : StaticInstance<GameManager>
         timerUI.text = "00:00";
         gameState = GameState.Initialized;
         timer = survivalTime.totalSeconds;
+        comboTimer = 0;
     }
 
     // Update is called once per frame
@@ -49,15 +57,31 @@ public class GameManager : StaticInstance<GameManager>
         FMODUnity.RuntimeManager.StudioSystem.setParameterByName("Game State", (float) gameState);
 
         if (gameState == GameState.Playing)
+        {
             timer = Mathf.Max(0, timer - Time.deltaTime);
+            comboTimer = Mathf.Max(0, comboTimer - Time.deltaTime);
+        }
         
+        if (comboTimer <= 0) ResetCombo();
         if (timer <= 0) WinGame();
     }
 
-    public void AddScore(int points)
+    public void AddScore(int points, TextPopup popup)
     {
-        score += points;
+        score += points * comboMultiplier;
+        popup.text = (points * comboMultiplier).ToString();
+        comboTimer = timeUntilComboReset;
+        OnComboUpdate?.Invoke(comboMultiplier);
     }
+
+    public void IncreaseCombo()
+    {
+        comboMultiplier = Mathf.Clamp(comboMultiplier + 1, 1, maxMultiplier);
+        comboTimer = timeUntilComboReset;
+        OnComboUpdate?.Invoke(comboMultiplier);
+    } 
+
+    private void ResetCombo() => comboMultiplier = 1;
 
     public void Reset() 
     {
@@ -92,9 +116,9 @@ public class GameManager : StaticInstance<GameManager>
     {
         gameUI.SetActive(false);
         youWinDisplay.SetActive(true);
-        youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
-        youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[3].text = 
+        youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[0].text = 
             string.Format("{00}:{1:00}", (int)timer / 60, (int)timer % 60);
+        youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
         gameState = GameState.Ended;
     }
 
@@ -102,9 +126,9 @@ public class GameManager : StaticInstance<GameManager>
     {
         gameUI.SetActive(false);
         gameOverDisplay.SetActive(true);
-        gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
-        gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[3].text = 
+        gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[0].text = 
             string.Format("{00}:{1:00}", (int)timer / 60, (int)timer % 60);
+        gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
         gameState = GameState.Ended;
     }
 }

@@ -24,6 +24,8 @@ public class PlayerController : StaticInstance<PlayerController>
     List<Transform> targets;
     // bool targetWasReached = false;
 
+    public Joystick joystick;
+
     Coroutine reelCrash;
     private Transform targetGroup;
 
@@ -57,27 +59,6 @@ public class PlayerController : StaticInstance<PlayerController>
         }
     }
 
-    // private void OnCollisionEnter2D(Collision2D other) 
-    // {
-    //     int defaultLayer = LayerMask.NameToLayer("Default");
-    //     if (isReeling && other.collider.gameObject.layer == defaultLayer)
-    //     {
-    //         targets = DiceController.Instance.GetTangledPoints();
-    //         bool otherIsEntangled = targets[0] == other.transform;
-    //         if (!otherIsEntangled && !other.gameObject.CompareTag("Indestructible"))
-    //         {
-    //             Enemy enemy = other.gameObject.GetComponent<Enemy>();
-    //             enemy.GetDamaged(enemy.numberOfChips);
-    //             tackleInstance.start();
-    //         }
-    //         else if (otherIsEntangled)
-    //         {
-    //             targetWasReached = true;
-    //             tackleInstance.start();
-    //         }
-    //     }
-    // }
-
     private void OnCollisionStay2D(Collision2D other) 
     {
         int defaultLayer = LayerMask.NameToLayer("Default");
@@ -93,7 +74,6 @@ public class PlayerController : StaticInstance<PlayerController>
 
     private void OnDestroy() {
         if (reelCrash != null) StopCoroutine(reelCrash);
-        // tackleInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
     }
 
     // Start is called before the first frame update
@@ -146,36 +126,46 @@ public class PlayerController : StaticInstance<PlayerController>
 
         if (GameManager.Instance.gameState == GameState.Playing)
         {
-            input.x = Input.GetAxis("Horizontal");
-            input.y = Input.GetAxis("Vertical");
-
-
-            if (!DiceController.Instance.IsTangled)
-            {
-                if (Input.GetKey(KeyCode.Space)) DiceController.Instance.LengthenWire();
+            #if UNITY_STANDALONE || UNITY_EDITOR
+                input.x = Input.GetAxis("Horizontal");
+                input.y = Input.GetAxis("Vertical");
                 
-                float wireLength = DiceController.Instance.joint.distance;
-                if (wireLength > 3 && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ) 
-                    DiceController.Instance.ShortenWire();
-                else if (wireLength <=3 && (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)))
-                    DiceController.Instance.ReelBack();
+                if (Input.GetKey(KeyCode.Space)) 
+                    OnLengthenKeyPress();
+                
+                if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
+                    OnShortenKeyPress();
+            #endif
 
-            }
-            else
+            #if UNITY_ANDROID || UNITY_IOS
+                input = joystick.Direction;
+            #endif
+        }
+    }
+
+    public void OnShortenKeyPress() 
+    {
+        if (!DiceController.Instance.IsTangled)
+        {
+            float wireLength = DiceController.Instance.joint.distance;
+            if (wireLength > 3) 
+                DiceController.Instance.ShortenWire();
+            else if (wireLength <= 3)
+                DiceController.Instance.ReelBack();
+        }
+        else
+        {
+            if (!isReeling)
             {
-                if (!isReeling && (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)))
-                {
-                    isReeling = true;
-                    reelCrash = StartCoroutine(ReelCrash());
-                }
-                // else if (!isReeling && targetWasReached)
-                // {
-                //     DiceController.Instance.Detangle();
-                //     targetWasReached = false;
-                // }
+                isReeling = true;
+                reelCrash = StartCoroutine(ReelCrash());
             }
         }
+    }
 
+    public void OnLengthenKeyPress()
+    {
+        DiceController.Instance.LengthenWire();
     }
 
     IEnumerator ReelCrash()

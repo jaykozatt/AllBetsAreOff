@@ -17,7 +17,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void Awake() {
         cam = Camera.main;
-        enemies = Resources.LoadAll<GameObject>("Prefab");
+        enemies = Resources.LoadAll<GameObject>("Prefab/Enemies");
         actors = GameObject.Find("/Actors").transform;
     }
 
