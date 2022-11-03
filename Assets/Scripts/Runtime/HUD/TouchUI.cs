@@ -4,55 +4,58 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class TouchUI : StaticInstance<ControlsUI>
+namespace AllBets
 {
-    public Image shiftKey;
-    public Image spaceKey;
-    public Color normalColor;
-    public Color highlightColor;
-
-    DiceController dice;
-    Coroutine flashRoutine;
-
-    private void OnDestroy() {
-        if (flashRoutine != null) StopCoroutine(flashRoutine);
-    }
-
-    // Start is called before the first frame update
-    void Start()
+    public class TouchUI : StaticInstance<ControlsUI>
     {
-        dice = DiceController.Instance;
-        // flashRoutine = StartCoroutine(Flash());
-    }
+        public Image shiftKey;
+        public Image spaceKey;
+        public Color normalColor;
+        public Color highlightColor;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (dice.IsDeployed) 
-        {
-            spaceKey.color = normalColor;
+        DiceController dice;
+        Coroutine flashRoutine;
+
+        private void OnDestroy() {
+            if (flashRoutine != null) StopCoroutine(flashRoutine);
         }
-        else
-        {
-            spaceKey.color = highlightColor;
-        } 
 
-        if (dice.IsEntangled) 
+        // Start is called before the first frame update
+        void Start()
         {
-            shiftKey.color = highlightColor;
+            dice = DiceController.Instance;
+            // flashRoutine = StartCoroutine(Flash());
         }
-        else
-        {
-            shiftKey.color = normalColor;
-        } 
-    }
 
-    IEnumerator Flash() 
-    {
-        while (true)
+        // Update is called once per frame
+        void Update()
         {
-            shiftKey.color = shiftKey.color == normalColor ? highlightColor : normalColor;
-            yield return new WaitForSeconds(.5f);
+            if (dice.IsDeployed) 
+            {
+                spaceKey.color = normalColor;
+            }
+            else
+            {
+                spaceKey.color = highlightColor;
+            } 
+
+            if (dice.IsEntangled) 
+            {
+                shiftKey.color = highlightColor;
+            }
+            else
+            {
+                shiftKey.color = normalColor;
+            } 
+        }
+
+        IEnumerator Flash() 
+        {
+            while (true)
+            {
+                shiftKey.color = shiftKey.color == normalColor ? highlightColor : normalColor;
+                yield return new WaitForSeconds(.5f);
+            }
         }
     }
 }

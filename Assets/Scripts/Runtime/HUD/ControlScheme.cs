@@ -2,23 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ControlScheme : MonoBehaviour
+namespace AllBets
 {
-    public GameObject TouchScheme;
-    public GameObject KeyboardScheme;
-
-    // Start is called before the first frame update
-    void Start()
+    public class ControlScheme : MonoBehaviour
     {
-        #if UNITY_ANDROID || UNITY_IOS 
-            TouchScheme.SetActive(true);
-            KeyboardScheme.SetActive(false);
-        #endif
+        public GameObject TouchScheme;
+        public GameObject KeyboardScheme;
 
-        #if UNITY_STANDALONE
-            TouchScheme.SetActive(false);
-            KeyboardScheme.SetActive(true);
-        #endif
+        // Start is called before the first frame update
+        void Start()
+        {
+            #if UNITY_ANDROID || UNITY_IOS 
+                TouchScheme.SetActive(true);
+                KeyboardScheme.SetActive(false);
+            #endif
+
+            #if UNITY_STANDALONE
+                TouchScheme.SetActive(false);
+                KeyboardScheme.SetActive(true);
+            #endif
+        }
+
     }
-
 }

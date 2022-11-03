@@ -2,26 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Shadow : MonoBehaviour
+namespace AllBets
 {
-    public Transform caster;
-    [HideInInspector] public SpriteRenderer sprite;
-    Vector3 offset;
-
-    void Awake() 
+    public class Shadow : MonoBehaviour
     {
-        sprite = GetComponent<SpriteRenderer>();
-    }
+        public Transform caster;
+        [HideInInspector] public SpriteRenderer sprite;
+        Vector3 offset;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        offset = transform.localPosition;
-    }
+        void Awake() 
+        {
+            sprite = GetComponent<SpriteRenderer>();
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        transform.localPosition = caster.localPosition + offset;
+        // Start is called before the first frame update
+        void Start()
+        {
+            offset = transform.localPosition;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            transform.localPosition = caster.localPosition + offset;
+        }
     }
 }

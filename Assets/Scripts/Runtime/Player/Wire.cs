@@ -2,61 +2,66 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Wire : MonoBehaviour
+namespace AllBets
 {
-    public FMODUnity.EventReference sliceSFX;
-    private FMOD.Studio.EventInstance sliceInstance;
-
-    Vector2 pivotPos;
-    Vector2 diePos;
-    List<Vector2> positions;
-    new EdgeCollider2D  collider;
-
-    private void OnTriggerEnter2D(Collider2D other) 
+    public class Wire : MonoBehaviour
     {
-        if (DiceController.Instance.IsDeployed)
+        public FMODUnity.EventReference sliceSFX;
+        private FMOD.Studio.EventInstance sliceInstance;
+
+        Vector2 pivotPos;
+        Vector2 diePos;
+        List<Vector2> positions;
+        new EdgeCollider2D  collider;
+
+        private void OnTriggerEnter2D(Collider2D other) 
         {
-            if (!other.CompareTag("Untagged"))
+            if (DiceController.Instance.IsDeployed)
             {
-                DiceController.Instance.TangleWireTo(other);
-            }
-            else
-            {
-                if (!other.CompareTag("Indestructible"))
+                if (!other.CompareTag("Untagged"))
                 {
-                    Enemy enemy = other.GetComponent<Enemy>();
-                    int damage = Mathf.Max(1, enemy.numberOfChips / 2);
-                    
-                    enemy.GetDamaged(damage);
-                    sliceInstance.start();
+                    DiceController.Instance.TangleWireTo(other);
+                }
+                else
+                {
+                    if (!other.CompareTag("Indestructible"))
+                    {
+                        Enemy enemy = other.GetComponent<Enemy>();
+                        int damage = Mathf.Max(1, enemy.numberOfChips / 2);
+                        
+                        enemy.GetDamaged(damage);
+                        sliceInstance.start();
+                    }
                 }
             }
         }
-    }
 
-    private void OnDestroy() {
-        sliceInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
-    }
+        private void OnDestroy() 
+        {
+            sliceInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            sliceInstance.release();
+        }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        collider = GetComponent<EdgeCollider2D>();
-        positions = new List<Vector2>();
+        // Start is called before the first frame update
+        void Start()
+        {
+            collider = GetComponent<EdgeCollider2D>();
+            positions = new List<Vector2>();
 
-        sliceInstance = FMODUnity.RuntimeManager.CreateInstance(sliceSFX);
-    }
+            sliceInstance = FMODUnity.RuntimeManager.CreateInstance(sliceSFX);
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        pivotPos = DiceController.Instance.pivot.position - transform.position;
-        diePos = DiceController.Instance.transform.position - transform.position;
+        // Update is called once per frame
+        void Update()
+        {
+            pivotPos = DiceController.Instance.pivot.position - transform.position;
+            diePos = DiceController.Instance.transform.position - transform.position;
 
-        positions.Clear();
-        positions.Add(diePos);
-        positions.Add(pivotPos);
+            positions.Clear();
+            positions.Add(diePos);
+            positions.Add(pivotPos);
 
-        collider.SetPoints(positions);
+            collider.SetPoints(positions);
+        }
     }
 }

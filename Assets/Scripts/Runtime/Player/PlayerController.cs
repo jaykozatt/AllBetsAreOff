@@ -2,222 +2,231 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using DG.Tweening;
 
-public class PlayerController : StaticInstance<PlayerController>
+namespace AllBets
 {
-
-    public FMODUnity.EventReference tackleSFX;
-    private FMOD.Studio.EventInstance tackleInstance;
-
-    public int lives = 3;
-    public int invincibilityFrames = 10;
-    private int framesUntilVulnerable = 0;
-
-    public float speed;
-    Vector2 input;
-    public Rigidbody2D rb;
-    private CircleCollider2D hurtbox;
-    bool isReeling = false;
-    float lookaheadValue;
-    CinemachineVirtualCamera vcam1;
-    CinemachineFramingTransposer transposer;
-    List<Transform> targets;
-    // bool targetWasReached = false;
-
-    public Joystick joystick;
-
-    Coroutine reelCrash;
-    private Transform targetGroup;
-
-    private void OnTriggerEnter2D(Collider2D other) {
-
-        int defaultLayer = LayerMask.NameToLayer("Default");
-        if (isReeling && other.gameObject.layer == defaultLayer)
-        {
-            targets = DiceController.Instance.GetTangledPoints();
-            bool otherIsEntangled = targets.Count > 0 && targets[0] == other.transform;
-            if (!otherIsEntangled && !other.gameObject.CompareTag("Indestructible"))
-            {
-                Enemy enemy = other.gameObject.GetComponent<Enemy>();
-                enemy.GetDamaged(enemy.numberOfChips);
-                tackleInstance.start();
-            }
-            else if (otherIsEntangled)
-            {
-                targets = DiceController.Instance.GetTangledPoints();
-                Transform target = targets[0];
-
-                DiceController.Instance.Detangle();
-                if (!target.CompareTag("Indestructible"))
-                {
-                    Enemy enemy = target.GetComponent<Enemy>();
-                    enemy.GetDamaged(enemy.numberOfChips);
-                }
-                
-                tackleInstance.start();
-            }
-        }
-    }
-
-    private void OnCollisionStay2D(Collision2D other) 
+    public class PlayerController : StaticInstance<PlayerController>
     {
-        int defaultLayer = LayerMask.NameToLayer("Default");
-        if (other.collider.gameObject.layer == defaultLayer)
-        {
-            targets = DiceController.Instance.GetTangledPoints();
-            if (targets.Count > 0 && targets[0] == other.transform)
-            {
-                DiceController.Instance.Detangle();   
-            }
-        }
-    }
+        #region Settings
+        [Header("Settings")]
+            public int lives = 3;
+            public int invincibilityFrames = 10;
+            public float movingSpeed = 90;
+        #endregion
 
-    private void OnDestroy() {
-        if (reelCrash != null) StopCoroutine(reelCrash);
-    }
+        #region References
+        [Header("References")]
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        hurtbox = GetComponentsInChildren<CircleCollider2D>()[1];
-        tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
-        targets = new List<Transform>();
-        vcam1 = GameObject.Find("/Setup/CM vcam1").GetComponent<CinemachineVirtualCamera>();
-        transposer = vcam1.GetCinemachineComponent<CinemachineFramingTransposer>();
-        targetGroup = GameObject.Find("/Actors/Player/TargetGroup").transform;
+            #region FMOD
+                public FMODUnity.EventReference tackleSFX;
+                private FMOD.Studio.EventInstance tackleInstance;
+            #endregion
 
-        lookaheadValue = transposer.m_LookaheadTime;
-        
-    }
+            [HideInInspector] public Rigidbody2D rb;
+            private CircleCollider2D hurtbox;
+            CinemachineVirtualCamera vcam1;
+            CinemachineFramingTransposer transposer;
+            private Transform targetGroup;
+            public Joystick joystick;
+        #endregion
 
-    // Update is called once per frame
-    void Update()
-    {
-        ProcessInput();        
-        framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - 1);
+        #region Variables & Switches
+            private int framesUntilVulnerable = 0;
+            Vector2 input;
+            float lookaheadValue;
+            bool isReeling = false;
+        #endregion
 
-        if (DiceController.Instance.IsEntangled)
-            vcam1.Priority = 0;
-        else
-            vcam1.Priority = 2;
-    }
+        #region Coroutines References
+            Coroutine reelCrash;
+        #endregion
 
-    private void FixedUpdate() 
-    {
-        rb.AddForce(rb.mass * input * speed);
-        
-    }
-
-    void ProcessInput()
-    {
-        if(Input.GetKeyDown(KeyCode.Escape))
-            switch (GameManager.Instance.gameState)
-            {
-                case GameState.Playing:
-                    GameManager.Instance.PauseGame();
-                    break;
-                case GameState.Paused:
-                    print("Resuming!");
-                    GameManager.Instance.ResumeGame();
-                    break;
-                default: break;
-            }
-
-        if (GameManager.Instance.gameState == GameState.Playing)
-        {
-            #if UNITY_STANDALONE || UNITY_EDITOR
-                input.x = Input.GetAxis("Horizontal");
-                input.y = Input.GetAxis("Vertical");
-                
-                if (Input.GetKey(KeyCode.Space)) 
-                    OnLengthenKeyPress();
-                
-                if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
-                    OnShortenKeyPress();
-            #endif
-
-            #if UNITY_ANDROID || UNITY_IOS
-                input = joystick.Direction;
-            #endif
-        }
-    }
-
-    public void OnShortenKeyPress() 
-    {
-        if (!DiceController.Instance.IsEntangled)
-        {
-            float wireLength = DiceController.Instance.joint.distance;
-            if (wireLength > 3) 
-                DiceController.Instance.ShortenWire();
-            else if (wireLength <= 3)
-                DiceController.Instance.ReelBack();
-        }
-        else
-        {
-            if (!isReeling)
-            {
-                isReeling = true;
-                reelCrash = StartCoroutine(ReelCrash());
-            }
-        }
-    }
-
-    public void OnLengthenKeyPress()
-    {
-        DiceController.Instance.LengthenWire();
-    }
-
-    IEnumerator ReelCrash()
-    {
-        targets = DiceController.Instance.GetTangledPoints();
-        transposer.m_LookaheadTime = 0;
-        hurtbox.enabled = true;
-
-        Vector2 attackVector;
-        Transform target;
-        while (DiceController.Instance.IsEntangled)
-        {
-            target = targets[0];
-            attackVector = (target.position - transform.position).normalized;
-
-            rb.velocity = attackVector * speed * 2;
+        #region Couroutine Definitions
             
-            yield return null;
-        }
-
-        float radius = hurtbox.radius;
-        hurtbox.radius = 1.5f* radius;
-        yield return null;
-
-        while (rb.velocity.magnitude > 10)
-        {
-            yield return null;
-        }
-
-        isReeling = false;
-        transposer.m_LookaheadTime = lookaheadValue;
-        hurtbox.radius = radius;
-        hurtbox.enabled = false;
-    }
-
-    public void GetHurt()
-    {
-        if (framesUntilVulnerable <= 0 && !isReeling)
-        {
-            lives = Mathf.Max(0, lives - 1);
-            framesUntilVulnerable = invincibilityFrames;
-            LivesInterface.Instance.UpdateDisplay(lives);
-            LivesInterface.Instance.HurtFlash();
-            tackleInstance.start();
-
-            if (lives <= 0) 
+            IEnumerator ReelCrash() // Sequence that makes the character tackle an entangled entity
             {
-                GameManager.Instance.LoseGame();
-                Destroy(transform.parent.gameObject);
+                // Get the target that will be tackled
+                Transform target = DiceController.Instance.GetEntangledEntity().transform;
+                
+                transposer.m_LookaheadTime = 0;
+                hurtbox.enabled = true;
+
+                // While still entangled, move towards target
+                Vector2 attackVector;
+                while (DiceController.Instance.IsEntangled)
+                {
+                    attackVector = (target.position - transform.position).normalized;
+                    rb.velocity = attackVector * movingSpeed * 2;
+                    
+                    yield return null;
+                }
+
+                // Expand the hurtbox 1.5x its normal range
+                // to mimic a shockwave after target impact
+                float radius = hurtbox.radius;
+                hurtbox.radius = 1.5f* radius;
+                yield return null;
+
+                // Until the character slows down past a threshold
+                while (rb.velocity.magnitude > 10)
+                {
+                    yield return null;
+                }
+
+                // Set all values back to normal
+                isReeling = false;
+                transposer.m_LookaheadTime = lookaheadValue;
+                hurtbox.radius = radius;
+                hurtbox.enabled = false;
+
+                // Give the player a grace period to get their bearings back
+                framesUntilVulnerable = 20;
             }
-        }
+        #endregion
+
+        #region Monobehaviour Functions
+            private void OnTriggerEnter2D(Collider2D other) 
+            {
+                if (isReeling)
+                {
+                    tackleInstance.start(); // Play tackle SFX
+
+                    Enemy enemy; // Damage the 'other' if it's an enemy
+                    if (other.TryGetComponent<Enemy>(out enemy))
+                        enemy.GetDamaged(enemy.numberOfChips);
+                }
+            }
+
+            private void OnCollisionStay2D(Collision2D other) 
+            {
+                DiceController.Instance.TryDetangle(other.gameObject);
+            }
+
+            private void OnDestroy() 
+            {
+                if (reelCrash != null) StopCoroutine(reelCrash);
+                tackleInstance.release();
+            }
+
+            void Start()
+            {
+                rb = GetComponent<Rigidbody2D>();
+                hurtbox = GetComponentsInChildren<CircleCollider2D>()[1];
+                tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
+
+                // Cinemachine References
+                vcam1 = GameObject.Find("/Setup/CM vcam1").GetComponent<CinemachineVirtualCamera>();
+                targetGroup = GameObject.Find("/Actors/Player/TargetGroup").transform;
+                transposer = vcam1.GetCinemachineComponent<CinemachineFramingTransposer>();
+                lookaheadValue = transposer.m_LookaheadTime;
+            }
+
+            void Update()
+            {
+                ProcessInput();
+
+                // Tick invincibility freames        
+                framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - 1);
+
+                // Switch to wider frame of view when entangled
+                if (DiceController.Instance.IsEntangled)
+                    vcam1.Priority = 0;
+                else
+                    vcam1.Priority = 2;
+            }
+
+            private void FixedUpdate() 
+            {
+                // Move the player character according to input
+                rb.AddForce(rb.mass * input * movingSpeed);
+            }
+        #endregion
+
+        #region Core Functions
+            void ProcessInput()
+            {
+                if(Input.GetKeyDown(KeyCode.Escape))
+                    switch (GameManager.Instance.gameState)
+                    {
+                        case GameState.Playing:
+                            GameManager.Instance.PauseGame();
+                            break;
+                        case GameState.Paused:
+                            GameManager.Instance.ResumeGame();
+                            break;
+                        default: break;
+                    }
+
+                if (GameManager.Instance.gameState == GameState.Playing)
+                {
+                    #if UNITY_STANDALONE || UNITY_EDITOR
+                        input.x = Input.GetAxis("Horizontal");
+                        input.y = Input.GetAxis("Vertical");
+                        
+                        if (Input.GetKey(KeyCode.Space)) 
+                            OnLengthenKeyPress();
+                        
+                        if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
+                            OnShortenKeyPress();
+                    #endif
+
+                    #if UNITY_ANDROID || UNITY_IOS
+                        input = joystick.Direction;
+                    #endif
+                }
+            }
+
+            public void GetHurt()
+            {
+                // Unless currently invulnerable or reeling into a tackle,
+                // decrease the lives' counter
+                if (framesUntilVulnerable <= 0 && !isReeling)
+                {
+                    lives = Mathf.Max(0, lives - 1);
+                    framesUntilVulnerable = invincibilityFrames;
+                    
+                    LivesInterface.Instance.UpdateDisplay(lives);
+                    LivesInterface.Instance.HurtFlash();
+                    tackleInstance.start();
+
+                    // If lives reach 0, lose the game
+                    if (lives <= 0) 
+                    {
+                        GameManager.Instance.LoseGame();
+                        Destroy(transform.parent.gameObject);
+                    }
+                }
+            }
+        #endregion
+
+        #region Event Functions
+            public void OnShortenKeyPress() 
+            {
+                if (!DiceController.Instance.IsEntangled)
+                {
+                    float wireLength = DiceController.Instance.joint.distance;
+                    if (wireLength > 3) 
+                        DiceController.Instance.ShortenWire();
+                    else if (wireLength <= 3)
+                        DiceController.Instance.ReelBack();
+                }
+                else
+                {
+                    if (!isReeling)
+                    {
+                        isReeling = true;
+                        reelCrash = StartCoroutine(ReelCrash());
+                    }
+                }
+            }
+
+            public void OnLengthenKeyPress()
+            {
+                if (!DiceController.Instance.IsEntangled)
+                    DiceController.Instance.LengthenWire();
+            }
+        #endregion
 
     }
-
 }

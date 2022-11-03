@@ -2,53 +2,56 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LivesInterface : StaticInstance<LivesInterface>
+namespace AllBets
 {
-    public GameObject life1;
-    public GameObject life2;
-    public GameObject life3;
-
-    public GameObject hurtScreen;
-    public int framesOfFlash = 2;
-
-    public void UpdateDisplay(int lives)
+    public class LivesInterface : StaticInstance<LivesInterface>
     {
-        switch (PlayerController.Instance.lives)
+        public GameObject life1;
+        public GameObject life2;
+        public GameObject life3;
+
+        public GameObject hurtScreen;
+        public int framesOfFlash = 2;
+
+        public void UpdateDisplay(int lives)
         {
-            case 3:
-                life1.SetActive(true);
-                life2.SetActive(true);
-                life3.SetActive(true);
-                break;
-            case 2:
-                life1.SetActive(false);
-                life2.SetActive(true);
-                life3.SetActive(true);
-                break;
-            case 1:
-                life1.SetActive(false);
-                life2.SetActive(false);
-                life3.SetActive(true);
-                break;
-            default:
-                life1.SetActive(false);
-                life2.SetActive(false);
-                life3.SetActive(false);
-                break;
+            switch (PlayerController.Instance.lives)
+            {
+                case 3:
+                    life1.SetActive(true);
+                    life2.SetActive(true);
+                    life3.SetActive(true);
+                    break;
+                case 2:
+                    life1.SetActive(false);
+                    life2.SetActive(true);
+                    life3.SetActive(true);
+                    break;
+                case 1:
+                    life1.SetActive(false);
+                    life2.SetActive(false);
+                    life3.SetActive(true);
+                    break;
+                default:
+                    life1.SetActive(false);
+                    life2.SetActive(false);
+                    life3.SetActive(false);
+                    break;
+            }
         }
-    }
 
-    public void HurtFlash()
-    {
-        StartCoroutine(FlashScreenRoutine());
-    }
+        public void HurtFlash()
+        {
+            StartCoroutine(FlashScreenRoutine());
+        }
 
-    IEnumerator FlashScreenRoutine()
-    {
-        hurtScreen.SetActive(true);
-        for (int i = 0; i < framesOfFlash; i++)
-            yield return null;
-        hurtScreen.SetActive(false);
-        
+        IEnumerator FlashScreenRoutine()
+        {
+            hurtScreen.SetActive(true);
+            for (int i = 0; i < framesOfFlash; i++)
+                yield return null;
+            hurtScreen.SetActive(false);
+            
+        }
     }
 }

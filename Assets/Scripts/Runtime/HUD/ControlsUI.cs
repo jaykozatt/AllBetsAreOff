@@ -4,48 +4,51 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class ControlsUI : StaticInstance<ControlsUI>
+namespace AllBets
 {
-    public TextMeshProUGUI wasd;
-    public TextMeshProUGUI shift;
-    public Image shiftKey;
-    public TextMeshProUGUI space;
-    public Image spaceKey;
-
-    public Color normalColor;
-    public Color highlight; // EAB543
-
-    DiceController dice;
-
-    // Start is called before the first frame update
-    void Start()
+    public class ControlsUI : StaticInstance<ControlsUI>
     {
-        dice = DiceController.Instance;
-    }
+        public TextMeshProUGUI wasd;
+        public TextMeshProUGUI shift;
+        public Image shiftKey;
+        public TextMeshProUGUI space;
+        public Image spaceKey;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (dice.IsDeployed) 
-        {
-            space.text = "Lengthen";
-            spaceKey.color = normalColor;
-        }
-        else
-        {
-            space.text = "Deploy";
-            spaceKey.color = highlight;
-        } 
+        public Color normalColor;
+        public Color highlight; // EAB543
 
-        if (dice.IsEntangled) 
+        DiceController dice;
+
+        // Start is called before the first frame update
+        void Start()
         {
-            shift.text = "Tackle";
-            shiftKey.color = highlight;
+            dice = DiceController.Instance;
         }
-        else
+
+        // Update is called once per frame
+        void Update()
         {
-            shift.text = "Shorten";
-            shiftKey.color = normalColor;
-        } 
+            if (dice.IsDeployed) 
+            {
+                space.text = "Lengthen";
+                spaceKey.color = normalColor;
+            }
+            else
+            {
+                space.text = "Deploy";
+                spaceKey.color = highlight;
+            } 
+
+            if (dice.IsEntangled) 
+            {
+                shift.text = "Tackle";
+                shiftKey.color = highlight;
+            }
+            else
+            {
+                shift.text = "Shorten";
+                shiftKey.color = normalColor;
+            } 
+        }
     }
 }
