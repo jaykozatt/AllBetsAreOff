@@ -8,47 +8,52 @@ namespace AllBets
 {
     public class ControlsUI : StaticInstance<ControlsUI>
     {
-        public TextMeshProUGUI wasd;
-        public TextMeshProUGUI shift;
-        public Image shiftKey;
-        public TextMeshProUGUI space;
-        public Image spaceKey;
+        #region Settings
+        [Header("Settings")]
+            public Color normalColor;
+            public Color highlight; // #EAB543
+        #endregion
 
-        public Color normalColor;
-        public Color highlight; // EAB543
+        #region References
+        [Header("References")]
+            public TextMeshProUGUI wasd;
+            public Image shiftKey;
+            public TextMeshProUGUI shift;
+            public Image spaceKey;
+            public TextMeshProUGUI space;
+            private DiceController dice;
+        #endregion
 
-        DiceController dice;
-
-        // Start is called before the first frame update
-        void Start()
-        {
-            dice = DiceController.Instance;
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            if (dice.IsDeployed) 
+        #region Monobehaviour Functions
+            void Start()
             {
-                space.text = "Lengthen";
-                spaceKey.color = normalColor;
+                dice = DiceController.Instance;
             }
-            else
-            {
-                space.text = "Deploy";
-                spaceKey.color = highlight;
-            } 
 
-            if (dice.IsEntangled) 
+            void Update()
             {
-                shift.text = "Tackle";
-                shiftKey.color = highlight;
+                if (dice.IsDeployed) 
+                {
+                    space.text = "Lengthen";
+                    spaceKey.color = normalColor;
+                }
+                else
+                {
+                    space.text = "Deploy";
+                    spaceKey.color = highlight;
+                } 
+
+                if (dice.IsEntangled) 
+                {
+                    shift.text = "Tackle";
+                    shiftKey.color = highlight;
+                }
+                else
+                {
+                    shift.text = "Shorten";
+                    shiftKey.color = normalColor;
+                } 
             }
-            else
-            {
-                shift.text = "Shorten";
-                shiftKey.color = normalColor;
-            } 
-        }
+        #endregion
     }
 }

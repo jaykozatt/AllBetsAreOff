@@ -67,6 +67,10 @@ PrefabInstance:
       propertyPath: popup
       value: 
       objectReference: {fileID: 8766519061520662616, guid: 7f01be60966133e4ab94b57feb045c8c, type: 3}
+    - target: {fileID: 7752700483937480694, guid: 098c4b755e8fe5f4a9acf4488bf38b69, type: 3}
+      propertyPath: scorePopup
+      value: 
+      objectReference: {fileID: 8766519061520662616, guid: 7f01be60966133e4ab94b57feb045c8c, type: 3}
     - target: {fileID: 8592116511932157387, guid: 098c4b755e8fe5f4a9acf4488bf38b69, type: 3}
       propertyPath: m_IsActive
       value: 0

@@ -25,9 +25,7 @@ namespace AllBets
 
             [HideInInspector] public Rigidbody2D rb;
             private CircleCollider2D hurtbox;
-            CinemachineVirtualCamera vcam1;
             CinemachineFramingTransposer transposer;
-            private Transform targetGroup;
             public Joystick joystick;
         #endregion
 
@@ -47,7 +45,7 @@ namespace AllBets
             IEnumerator ReelCrash() // Sequence that makes the character tackle an entangled entity
             {
                 // Get the target that will be tackled
-                Transform target = DiceController.Instance.GetEntangledEntity().transform;
+                Transform target = DiceController.Instance.entangledEntity.transform;
                 
                 transposer.m_LookaheadTime = 0;
                 hurtbox.enabled = true;
@@ -91,16 +89,14 @@ namespace AllBets
                 if (isReeling)
                 {
                     tackleInstance.start(); // Play tackle SFX
+                    
+                    // If the 'other' is entangled, then detangle.
+                    DiceController.Instance.TryDetangle(other.gameObject);
 
                     Enemy enemy; // Damage the 'other' if it's an enemy
                     if (other.TryGetComponent<Enemy>(out enemy))
                         enemy.GetDamaged(enemy.numberOfChips);
                 }
-            }
-
-            private void OnCollisionStay2D(Collision2D other) 
-            {
-                DiceController.Instance.TryDetangle(other.gameObject);
             }
 
             private void OnDestroy() 
@@ -116,8 +112,7 @@ namespace AllBets
                 tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
 
                 // Cinemachine References
-                vcam1 = GameObject.Find("/Setup/CM vcam1").GetComponent<CinemachineVirtualCamera>();
-                targetGroup = GameObject.Find("/Actors/Player/TargetGroup").transform;
+                CinemachineVirtualCamera vcam1 = CameraController.Instance.frame1.vcam;
                 transposer = vcam1.GetCinemachineComponent<CinemachineFramingTransposer>();
                 lookaheadValue = transposer.m_LookaheadTime;
             }
@@ -130,10 +125,7 @@ namespace AllBets
                 framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - 1);
 
                 // Switch to wider frame of view when entangled
-                if (DiceController.Instance.IsEntangled)
-                    vcam1.Priority = 0;
-                else
-                    vcam1.Priority = 2;
+                CameraController.Instance.frame2.SetActive(DiceController.Instance.IsEntangled);
             }
 
             private void FixedUpdate() 

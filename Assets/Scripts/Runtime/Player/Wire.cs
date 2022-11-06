@@ -24,12 +24,12 @@ namespace AllBets
                 }
                 else
                 {
-                    if (!other.CompareTag("Indestructible"))
+                    Enemy enemy;
+                    if (other.TryGetComponent<Enemy>(out enemy))
                     {
-                        Enemy enemy = other.GetComponent<Enemy>();
                         int damage = Mathf.Max(1, enemy.numberOfChips / 2);
-                        
                         enemy.GetDamaged(damage);
+                        
                         sliceInstance.start();
                     }
                 }

@@ -25,6 +25,8 @@ public class AddNGonPolygonCollider : MonoBehaviour
     /***************************************************************************
      * INSPECTOR VARIABLES
      **************************************************************************/
+    public bool isTrigger = false;
+    public bool usedByEffector = false;
 
     /// <summary>
     /// The number of sides for the generated polygon.
@@ -58,6 +60,8 @@ public class AddNGonPolygonCollider : MonoBehaviour
 
         //set physics material of new collider
         newCollider.sharedMaterial = physicsMaterial2D;
+        newCollider.isTrigger = isTrigger;
+        newCollider.usedByEffector = usedByEffector;
 
         List<Vector2> allPoints = new List<Vector2> ((numSides+1)*2);
 

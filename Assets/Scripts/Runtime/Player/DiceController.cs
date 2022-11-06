@@ -8,262 +8,318 @@ namespace AllBets
 {
     public class DiceController : StaticInstance<DiceController>
     {
-        public FMODUnity.EventReference impactSFX;
-        private FMOD.Studio.EventInstance impactInstance;
+        /* With support from the 'Wire' class,
+         * this class controls all aspects regarding
+         * the movement and interactions of the Die
+        */
 
-        public CinemachineVirtualCamera cam;
-        private Shadow shadow;
+        #region Settings
+        [Header("Settings")]
+            public float angularVelocity = 1;
+            public float lengthRate = 1;
+        #endregion
 
-        public LineRenderer line;
-        public List<Vector3> linePositions;
-        
-        public DistanceJoint2D joint;
-        private Rigidbody2D rb;
-        private new Collider2D collider;
-        private new SpriteRenderer renderer;
-        public float velocity = 1;
-        public float lengthRate = 1;
-        public Transform pivot;
-        private bool isDeploying = false;
-        private int flipper = 1;
-        private int diceNumber = 0;
-
-        public Sprite[] dice;
-
-        private GameObject entangledEntity;
-        Coroutine reelBack;
-        Coroutine diceCycler;
-
-        PlayerController Player {
-            get => PlayerController.Instance;
-        }
-        public bool IsEntangled {
-            get => entangledEntity != null;
-        }
-        public bool IsDeployed {
-            get => this.enabled;
-        }
-        public int CurrentDice {
-            get => diceNumber + 1;
-        }
-
-        private void OnCollisionEnter2D(Collision2D other) 
-        {
-            if (other.collider.CompareTag("Player") && !isDeploying && !IsEntangled)
-            {
-                this.enabled = false;
-            }
-            else if (!other.collider.CompareTag("Player"))
-            {
-                // flipper = flipper == 1 ? -1 : 1;
-                rb.velocity = other.relativeVelocity;
-
-                Enemy enemy;
-                if (other.gameObject.TryGetComponent<Enemy>(out enemy))
-                    enemy.GetDamaged(1);
-
-                impactInstance.start();
-            }
+        #region References
             
-        }
+            #region FMOD SFX
+            [Header("SFX")]
+                [SerializeField] FMODUnity.EventReference impactSFX;
+            #endregion
 
-        private void OnCollisionStay2D(Collision2D other) 
-        {
-            if (other.collider.CompareTag("Player") && !isDeploying && !IsEntangled)
-            {
-                this.enabled = false;
+            public Transform pivot {get; private set;}
+            public GameObject entangledEntity {get; private set;}
+            private LineRenderer line;
+            private List<Vector3> linePositions;
+            
+            private Rigidbody2D rb;
+            public DistanceJoint2D joint {get; private set;}
+            private new Collider2D collider;
+            private new SpriteRenderer renderer;
+            private Shadow shadow;
+            
+            private Sprite[] dieSprites;
+            private ParticleSystem afterimage;
+            private ParticleSystem.MainModule afterimageMain;
+        #endregion
+
+        #region Variables & Switches
+            private int momentumFlipper = 1;
+            private int dieNumber = 0;
+            private bool isDeploying = false;
+        #endregion
+
+        #region Properties
+            PlayerController Player {
+                get => PlayerController.Instance;
             }
-        }
-        private void OnEnable() 
-        {
-            renderer.enabled = true;
-            collider.enabled = true;
-            line.enabled = true;
-            shadow.sprite.enabled = true;    
-            DrawWire();
-        }
+            public bool IsEntangled {
+                get => entangledEntity != null;
+            }
+            public bool IsDeployed {
+                get => this.enabled;
+            }
+            public int CurrentDieValue {
+                get => dieNumber + 1;
+            }
+        #endregion
+        
+        #region Coroutine References
+            Coroutine reelBack;
+            Coroutine diceCycler;
+        #endregion
 
-        private void OnDisable() 
-        {
-            renderer.enabled = false;
-            collider.enabled = false;
-            line.enabled = false;
-            shadow.sprite.enabled = false;
-        }
-
-        private void OnDestroy() 
-        {
-            if (diceCycler != null) StopCoroutine(diceCycler);
-            if (reelBack != null) StopCoroutine(reelBack);
-            impactInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
-            impactInstance.release();
-        }
-
-        protected override void Awake() 
-        {
-            base.Awake();
-
-            line = GetComponent<LineRenderer>();
-            linePositions = new List<Vector3>();
-
-            joint = GetComponentInParent<DistanceJoint2D>();
-            rb = GetComponentInParent<Rigidbody2D>();
-            collider = GetComponent<Collider2D>();
-            renderer = GetComponent<SpriteRenderer>();
-
-            shadow = transform.parent.GetComponentInChildren<Shadow>();
-            shadow.caster = transform;
-        }
-
-        // Start is called before the first frame update
-        void Start()
-        {
-            diceCycler = StartCoroutine(DiceCycler());
-            pivot = PlayerController.Instance.transform;
-            impactInstance = FMODUnity.RuntimeManager.CreateInstance(impactSFX);
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            CheckPivot();
-            SwingDie();
-            DrawWire();
-        }
-
-        void CheckPivot()
-        {
-            if (pivot == null || joint.connectedBody == null)
+        #region Coroutine Definitions
+            IEnumerator ReelBackRoutine()
             {
+                // Reel in until the die is picked up
+                while (IsDeployed)
+                {
+                    joint.distance = Mathf.Max(0, joint.distance - lengthRate * 4 * Time.deltaTime);
+
+                    yield return null;
+                }
+            }
+
+            IEnumerator DeployTimer()
+            {
+                isDeploying = true;
+                yield return new WaitForSeconds(0.25f);
+                isDeploying = false;
+            }
+
+            IEnumerator DiceCycler()
+            {
+                // Change the die's sprite every second
+                while (true) 
+                {
+                    yield return new WaitForSeconds(1);
+
+                    dieNumber = Random.Range(0, dieSprites.Length);
+                    renderer.sprite = dieSprites[dieNumber];
+                }
+            }
+        #endregion
+        
+        #region Monobehaviour Functions
+
+            #region Events
+                private void OnCollisionEnter2D(Collision2D other) 
+                {
+                    // If 'other' is the player, and the die is not currently being deployed or entangled
+                    if (other.collider.CompareTag("Player") && !isDeploying && !IsEntangled)
+                    {
+                        Pickup();
+                    }
+                    else if (!other.collider.CompareTag("Player"))
+                    {
+                        // Make the die bounce away
+                        rb.velocity = other.relativeVelocity;
+
+                        // If other is an enemy, knock a chip from the stack
+                        Enemy enemy;
+                        if (other.gameObject.TryGetComponent<Enemy>(out enemy))
+                            enemy.GetDamaged(1);
+
+                        // Play Impact SFX
+                        FMODUnity.RuntimeManager.PlayOneShot(impactSFX);
+                    }   
+                }
+
+                private void OnCollisionStay2D(Collision2D other) 
+                {
+                    // If the die wasn't picked up on first contact, then it's picked up now on the next frame
+                    if (other.collider.CompareTag("Player") && !isDeploying && !IsEntangled)
+                    {
+                        Pickup();
+                    }
+                }
+
+                private void OnDestroy() 
+                {
+                    if (diceCycler != null) StopCoroutine(diceCycler);
+                    if (reelBack != null) StopCoroutine(reelBack);
+                }
+            #endregion
+
+            protected override void Awake() 
+            {
+                base.Awake();
+
+                line = GetComponent<LineRenderer>();
+                linePositions = new List<Vector3>();
+                dieSprites = Resources.LoadAll<Sprite>("Sprites/Dice");
+
+                joint = GetComponentInParent<DistanceJoint2D>();
+                rb = GetComponentInParent<Rigidbody2D>();
+                collider = GetComponent<Collider2D>();
+                renderer = GetComponent<SpriteRenderer>();
+                afterimage = GetComponent<ParticleSystem>();
+                afterimageMain = afterimage.main;
+
+                shadow = transform.parent.GetComponentInChildren<Shadow>();
+                shadow.caster = transform;
+            }
+
+            void Start()
+            {
+                diceCycler = StartCoroutine(DiceCycler());
                 pivot = PlayerController.Instance.transform;
-                joint.connectedBody = PlayerController.Instance.rb;
             }
-        }
-        void SwingDie()
-        {
-            LayerMask mask = LayerMask.GetMask("Default");
-            if (!collider.IsTouchingLayers(mask))
+
+            void Update()
             {
-                if (IsEntangled) joint.distance = Mathf.Max(0, joint.distance - lengthRate * Time.deltaTime/2);
-                
-                Vector2 radius = (pivot.position - transform.position);
-                Vector2 direction = -radius.normalized;
-                (direction.x, direction.y) = (direction.y, -direction.x);
-
-                flipper = Vector3.Cross(rb.velocity,radius).z > 0 ? -1 : 1;
-
-                rb.AddForce(rb.mass * (flipper*direction - radius).normalized / radius.magnitude * velocity * velocity);
+                CheckPivot();
+                SwingDie();
+                DrawWire();
+                afterimageMain.startRotationZ = transform.localEulerAngles.z;
             }
-        }
+        #endregion
 
-        public void TangleWireTo(Collider2D other) 
-        {
-            // if (!entangledEntities.Contains(other.transform))
-            if (entangledEntity == null)
+        #region Core Functions
+            void CheckPivot()
             {
-                entangledEntity = other.gameObject;
-                pivot = entangledEntity.transform;
-                joint.connectedBody = other.attachedRigidbody;
-                joint.distance = ((Vector2)(transform.position - other.transform.position)).magnitude;
+                // Make sure that there's always a pivot to swing around of
+                if (pivot == null || joint.connectedBody == null)
+                {
+                    pivot = PlayerController.Instance.transform;
+                    joint.connectedBody = PlayerController.Instance.rb;
+                }
             }
-        }
 
-        public void Detangle()
-        {
-            entangledEntity = null;
-            pivot = Player.transform;
-            joint.connectedBody = Player.rb;
-        }
-
-        public bool TryDetangle(GameObject entity)
-        {
-            if (entangledEntity == entity)
+            void SwingDie() // Swings the die outwards
             {
+                // Stop applying force if the die is in contact with something
+                LayerMask mask = LayerMask.GetMask("Default");
+                if (!collider.IsTouchingLayers(mask))
+                {
+                    // Set linear drag back to 0
+                    rb.drag = 0;
+
+                    // While entangled, steadily reduce wire length to mimic a "wrap around" effect
+                    if (IsEntangled) joint.distance = Mathf.Max(0, joint.distance - lengthRate * Time.deltaTime/2);
+                    
+                    // Compute radial vector (non-normalised and pointing inwards) 
+                    // & centripetal acceleration magnitude
+                    Vector2 radius = (pivot.position - transform.position);
+                    float centripetalAccel = radius.magnitude * angularVelocity * angularVelocity;
+
+                    // Get the direction that's tangential to the radius
+                    Vector2 direction = -radius.normalized;
+                    (direction.x, direction.y) = (direction.y, -direction.x);
+
+                    // Figure out whether the die's moving clockwise or counter-clockwise
+                    momentumFlipper = Vector3.Cross(rb.velocity,radius).z > 0 ? -1 : 1;
+
+                    // Flip the direction according to current momentum. 
+                    // Then add the outwards-pointing radial vector. 
+                    // This is to cause the die to always move away from the centre
+                    // as far as possible until the Joint component cancels it out. 
+                    direction = (momentumFlipper * direction - radius).normalized;
+
+                    // Finally add the resultant force
+                    rb.AddForce(rb.mass * direction * centripetalAccel);
+                }
+                else
+                {
+                    rb.drag = 10; // Apply friction due to contact
+                }
+            }
+
+            void Pickup() 
+            {
+                // Hide everything related to the die and the wire
+                this.enabled = false;
+                renderer.enabled = false;
+                collider.enabled = false;
+                line.enabled = false;
+                shadow.sprite.enabled = false;
+                afterimage.Stop();
+            } 
+
+            void Deploy()
+            {
+                // Show everything related to the die and the wire
+                this.enabled = true;
+                renderer.enabled = true;
+                collider.enabled = true;
+                line.enabled = true;
+                shadow.sprite.enabled = true;
+                afterimage.Play();    
+
+                // Set wire length to 3 units, and update its graphic
+                joint.distance = 3;
+                DrawWire();
+
+                // Block further pickups for a set amount of time
+                StartCoroutine(DeployTimer());
+            }
+
+            public void TangleWireTo(Collider2D other) 
+            {
+                // If no entity is entangled, entangle the 'other'
+                if (entangledEntity == null)
+                {
+                    entangledEntity = other.gameObject;
+                    pivot = entangledEntity.transform;
+                    joint.connectedBody = other.attachedRigidbody;
+                    joint.distance = ((Vector2)(transform.position - other.transform.position)).magnitude;
+                }
+            }
+
+            public void Detangle()
+            {
+                // Reset pivot to player, and detangle die
                 entangledEntity = null;
                 pivot = Player.transform;
                 joint.connectedBody = Player.rb;
-
-                return true;
             }
 
-            return false;
-        }
-
-        void DrawWire()
-        {
-            linePositions.Clear();
-            
-            linePositions.Add(PlayerController.Instance.transform.position);
-            if (entangledEntity) linePositions.Add(entangledEntity.transform.position);
-            linePositions.Add(transform.position);
-
-            line.positionCount = linePositions.Count;
-            line.SetPositions(linePositions.ToArray());
-        }
-
-        public void LengthenWire()
-        {
-            if (!this.enabled)
+            public bool TryDetangle(GameObject entity)
             {
-                joint.distance = 3;
-                this.enabled = true;
-                isDeploying = true;
-                StartCoroutine(DeployTimer());
+                // Try to detangle the given 'entity'
+                if (entangledEntity == entity)
+                {
+                    entangledEntity = null;
+                    pivot = Player.transform;
+                    joint.connectedBody = Player.rb;
+
+                    return true;
+                }
+
+                // If given 'entity' is not entangled, do nothing
+                return false;
             }
-            else
+
+            void DrawWire()
             {
-                joint.distance = Mathf.Min(8, joint.distance + lengthRate * Time.deltaTime);
+                linePositions.Clear();
+                
+                linePositions.Add(PlayerController.Instance.transform.position);
+                if (entangledEntity) linePositions.Add(entangledEntity.transform.position);
+                linePositions.Add(transform.position);
+
+                line.positionCount = linePositions.Count;
+                line.SetPositions(linePositions.ToArray());
             }
 
-            
-            // if (cam.m_Lens.OrthographicSize < joint.distance) 
-            //     cam.m_Lens.OrthographicSize = joint.distance;
-        }
-
-        public void ShortenWire()
-        {
-            joint.distance = Mathf.Max(3, joint.distance - lengthRate * Time.deltaTime);
-
-            // if (cam.m_Lens.OrthographicSize > 5 && cam.m_Lens.OrthographicSize > joint.distance)
-            //     cam.m_Lens.OrthographicSize = Mathf.Max(5, joint.distance);
-        }
-
-        public void ReelBack()
-        {
-            reelBack = StartCoroutine(ReelBackRoutine());
-        }
-
-        public GameObject GetEntangledEntity()
-        {
-            return entangledEntity;
-        }
-
-        IEnumerator ReelBackRoutine()
-        {
-            while (this.enabled)
+            public void LengthenWire()
             {
-                joint.distance = Mathf.Max(0, joint.distance - lengthRate * 4 * Time.deltaTime);
-
-                yield return null;
+                if (!IsDeployed) Deploy();
+                else joint.distance = 
+                    Mathf.Min(8, joint.distance + lengthRate * Time.deltaTime);
             }
-        }
 
-        IEnumerator DeployTimer()
-        {
-            yield return new WaitForSeconds(0.25f);
-            isDeploying = false;
-        }
-
-        IEnumerator DiceCycler()
-        {
-            while (true) 
+            public void ShortenWire()
             {
-                yield return new WaitForSeconds(1);
-
-                diceNumber = Random.Range(0, dice.Length);
-                renderer.sprite = dice[diceNumber];
+                joint.distance = 
+                    Mathf.Max(3, joint.distance - lengthRate * Time.deltaTime);
             }
-        }
+
+            public void ReelBack()
+            {
+                reelBack = StartCoroutine(ReelBackRoutine());
+            }
+        #endregion
 
     }
 }

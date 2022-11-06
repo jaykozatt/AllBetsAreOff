@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5fa82f5394007a04da99da7eeed226e7
+guid: adb9eaf6fafb21e4f8b909c4f63f9e3d
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -39,17 +39,17 @@ ScriptedImporter:
   spriteData:
     TessellationDetail: 0
     SpriteRect:
-      name: Enemy
+      name: 
       originalName: 
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       alignment: 0
       border: {x: 0, y: 0, z: 0, w: 0}
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 251
-        height: 256
-      spriteID: e7a16b3ee4e6e654d8a8b67812ebcf54
+        width: 0
+        height: 0
+      spriteID: a28cdf1970bc0be4ea6f7aa2da5b867c
       internalID: 0
     PhysicsOutlines: []

@@ -8,54 +8,57 @@ namespace AllBets
 {
     public class TouchUI : StaticInstance<ControlsUI>
     {
-        public Image shiftKey;
-        public Image spaceKey;
-        public Color normalColor;
-        public Color highlightColor;
+        #region Settings
+        [Header("Settings")]
+            public Color normalColor;
+            public Color highlightColor;
+        #endregion
 
-        DiceController dice;
-        Coroutine flashRoutine;
+        #region References
+        [Header("References")]
+            public Image shiftKey;
+            public Image spaceKey;
+            private DiceController die;
+        #endregion
 
-        private void OnDestroy() {
-            if (flashRoutine != null) StopCoroutine(flashRoutine);
-        }
+        #region Coroutine References
+            Coroutine flashRoutine;
+        #endregion
 
-        // Start is called before the first frame update
-        void Start()
-        {
-            dice = DiceController.Instance;
-            // flashRoutine = StartCoroutine(Flash());
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            if (dice.IsDeployed) 
+        #region Coroutine Definitions
+            IEnumerator Flash() 
             {
-                spaceKey.color = normalColor;
+                while (true)
+                {
+                    shiftKey.color = shiftKey.color == normalColor ? highlightColor : normalColor;
+                    yield return new WaitForSeconds(.5f);
+                }
             }
-            else
-            {
-                spaceKey.color = highlightColor;
-            } 
+        #endregion
 
-            if (dice.IsEntangled) 
-            {
-                shiftKey.color = highlightColor;
+        #region Monobehaviour Functions
+            private void OnDestroy() {
+                if (flashRoutine != null) StopCoroutine(flashRoutine);
             }
-            else
-            {
-                shiftKey.color = normalColor;
-            } 
-        }
 
-        IEnumerator Flash() 
-        {
-            while (true)
+            void Start()
             {
-                shiftKey.color = shiftKey.color == normalColor ? highlightColor : normalColor;
-                yield return new WaitForSeconds(.5f);
+                die = DiceController.Instance;
+                // flashRoutine = StartCoroutine(Flash());
             }
-        }
+
+            void Update()
+            {
+                // If the die is not deployed, highlight the deploy button
+                if (!die.IsDeployed) spaceKey.color = highlightColor;
+                else spaceKey.color = normalColor;
+
+                // If the die is entangled, highlight the tackle button
+                if (die.IsEntangled) shiftKey.color = highlightColor;
+                else shiftKey.color = normalColor;
+            }
+        #endregion
+
+
     }
 }
