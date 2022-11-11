@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 4545864071432670027}
   - component: {fileID: 4545864071432670026}
   - component: {fileID: 4545864071432670025}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Roulette Ball
   m_TagString: Indestructible
   m_Icon: {fileID: 0}

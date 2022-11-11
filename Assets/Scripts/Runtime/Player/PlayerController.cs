@@ -30,7 +30,7 @@ namespace AllBets
         #endregion
 
         #region Variables & Switches
-            private int framesUntilVulnerable = 0;
+            int framesUntilVulnerable = 0;
             Vector2 input;
             float lookaheadValue;
             bool isReeling = false;

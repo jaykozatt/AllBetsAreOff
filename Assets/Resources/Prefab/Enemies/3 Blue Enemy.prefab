@@ -17,7 +17,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7752700483937480650, guid: 098c4b755e8fe5f4a9acf4488bf38b69, type: 3}
       propertyPath: m_Name
-      value: 3 Enemy
+      value: 3 Blue Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 7752700483937480693, guid: 098c4b755e8fe5f4a9acf4488bf38b69, type: 3}
       propertyPath: m_RootOrder

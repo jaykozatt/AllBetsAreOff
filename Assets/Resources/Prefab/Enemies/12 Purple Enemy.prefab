@@ -97,11 +97,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6538697184641278835, guid: 69846c70e00fd0249917e7e0bd0bd1fa, type: 3}
       propertyPath: m_Name
-      value: 12 Tough Enemy
+      value: 12 Purple Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 6538697184641278835, guid: 69846c70e00fd0249917e7e0bd0bd1fa, type: 3}
       propertyPath: m_TagString
-      value: Tough
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 6538697185381173963, guid: 69846c70e00fd0249917e7e0bd0bd1fa, type: 3}
       propertyPath: m_Sprite

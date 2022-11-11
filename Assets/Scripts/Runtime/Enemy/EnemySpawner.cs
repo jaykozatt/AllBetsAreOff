@@ -33,15 +33,11 @@ namespace AllBets
                         point = cam.WorldToViewportPoint(transform.position);
                         if (point.x < 0 || point.x > 1 || point.y < 0 && point.y > 1)
                         {
-                            Instantiate(
-                                enemies[Random.Range(0,enemies.Length)],
-                                transform.position,
-                                Quaternion.identity,
-                                actors.transform
-                            );
-
-                            // Wait for a time interval before spawning next enemy
-                            yield return new WaitForSeconds(interval);
+                            GameObject instance; // Wait for a time interval after spawning a new enemy
+                            if (EnemyPool.Instance.TrySpawnAt(transform.position, out instance))
+                                yield return new WaitForSeconds(EnemyPool.Instance.spawnInterval);
+                            else
+                                yield return null;
                         }
                         else 
                         {

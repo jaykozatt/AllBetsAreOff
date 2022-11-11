@@ -53,7 +53,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3804088228178630909, guid: 2f2e8baddf6f4454ba83bb167243517f, type: 3}
       propertyPath: m_Name
-      value: '6 Tough Enemy '
+      value: 6 Purple Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 5137803791630854147, guid: 2f2e8baddf6f4454ba83bb167243517f, type: 3}
       propertyPath: m_IsActive

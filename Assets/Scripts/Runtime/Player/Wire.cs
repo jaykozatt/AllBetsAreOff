@@ -6,62 +6,59 @@ namespace AllBets
 {
     public class Wire : MonoBehaviour
     {
-        public FMODUnity.EventReference sliceSFX;
-        private FMOD.Studio.EventInstance sliceInstance;
+        #region References
+            #region FMOD SFX
+            [Header("SFX")]
+                public FMODUnity.EventReference sliceSFX;
+            #endregion
+            EdgeCollider2D  hitbox;
+        #endregion
 
-        Vector2 pivotPos;
-        Vector2 diePos;
-        List<Vector2> positions;
-        new EdgeCollider2D  collider;
-
-        private void OnTriggerEnter2D(Collider2D other) 
-        {
-            if (DiceController.Instance.IsDeployed)
+        #region Variables & Switches
+            Vector2 pivotPos;
+            Vector2 diePos;
+            List<Vector2> positions;
+        #endregion
+        
+        #region Monobehaviour Functions
+            private void OnTriggerEnter2D(Collider2D other) 
             {
-                if (!other.CompareTag("Untagged"))
+                if (DiceController.Instance.IsDeployed)
                 {
-                    DiceController.Instance.TangleWireTo(other);
-                }
-                else
-                {
-                    Enemy enemy;
-                    if (other.TryGetComponent<Enemy>(out enemy))
+                    Enemy enemy; // Enemies tagged as 'Wrap Immune' are sliced instead of entangled
+                    if (other.TryGetComponent<Enemy>(out enemy) && other.CompareTag("Wrap Immune"))
                     {
                         int damage = Mathf.Max(1, enemy.numberOfChips / 2);
                         enemy.GetDamaged(damage);
                         
-                        sliceInstance.start();
+                        FMODUnity.RuntimeManager.PlayOneShot(sliceSFX);
+                    }
+                    else
+                    {
+                        DiceController.Instance.TangleWireTo(other);
                     }
                 }
             }
-        }
 
-        private void OnDestroy() 
-        {
-            sliceInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
-            sliceInstance.release();
-        }
+            // Start is called before the first frame update
+            void Start()
+            {
+                hitbox = GetComponent<EdgeCollider2D>();
+                positions = new List<Vector2>();
+            }
 
-        // Start is called before the first frame update
-        void Start()
-        {
-            collider = GetComponent<EdgeCollider2D>();
-            positions = new List<Vector2>();
+            // Update is called once per frame
+            void Update()
+            {
+                pivotPos = DiceController.Instance.pivot.position - transform.position;
+                diePos = DiceController.Instance.transform.position - transform.position;
 
-            sliceInstance = FMODUnity.RuntimeManager.CreateInstance(sliceSFX);
-        }
+                positions.Clear();
+                positions.Add(diePos);
+                positions.Add(pivotPos);
 
-        // Update is called once per frame
-        void Update()
-        {
-            pivotPos = DiceController.Instance.pivot.position - transform.position;
-            diePos = DiceController.Instance.transform.position - transform.position;
-
-            positions.Clear();
-            positions.Add(diePos);
-            positions.Add(pivotPos);
-
-            collider.SetPoints(positions);
-        }
+                hitbox.SetPoints(positions);
+            }
+        #endregion
     }
 }

@@ -57,7 +57,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6538697184641278835, guid: 69846c70e00fd0249917e7e0bd0bd1fa, type: 3}
       propertyPath: m_Name
-      value: 6 Enemy
+      value: 6 Blue Enemy
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 69846c70e00fd0249917e7e0bd0bd1fa, type: 3}
