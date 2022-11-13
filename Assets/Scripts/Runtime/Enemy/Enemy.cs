@@ -109,7 +109,10 @@ namespace AllBets
             {
                 if (followAI != null) StopCoroutine(followAI);
                 if (DiceController.Instance != null)
+                {
                     DiceController.Instance.TryDetangle(gameObject);    
+                    PlayerController.Instance.TryDetangle(gameObject);
+                }
             }
 
             private void OnDestroy()
@@ -125,7 +128,10 @@ namespace AllBets
                 slideInstance.release();
 
                 if (DiceController.Instance != null)
+                {
                     DiceController.Instance.TryDetangle(gameObject);
+                    PlayerController.Instance.TryDetangle(gameObject);
+                }
             }
 
             private void Awake() 
@@ -210,7 +216,10 @@ namespace AllBets
                     StopCoroutine(followAI);
                     EnemyPool.Instance.Despawn(gameObject);
                     if (DiceController.Instance != null)
+                    {
                         DiceController.Instance.TryDetangle(gameObject);
+                        PlayerController.Instance.TryDetangle(gameObject);
+                    }
                 }    
             }
         #endregion

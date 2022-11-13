@@ -24,9 +24,12 @@ namespace AllBets
                 private FMOD.Studio.EventInstance tackleInstance;
             #endregion
 
+            
+            public GameObject entangledEntity {get; private set;}
             [HideInInspector] public Rigidbody2D rb;
             public Collider2D hitbox {get; private set;}
             private CircleCollider2D hurtbox;
+            public DistanceJoint2D joint {get; private set;}
             CinemachineFramingTransposer transposer;
             public Joystick joystick;
         #endregion
@@ -98,7 +101,10 @@ namespace AllBets
             private void OnCollisionEnter2D(Collision2D other) 
             {
                 if (isReeling)
+                {
                     DiceController.Instance.TryDetangle(other.gameObject);
+                    TryDetangle(other.gameObject);
+                }
             }
 
             private void OnTriggerEnter2D(Collider2D other) 
@@ -122,12 +128,19 @@ namespace AllBets
                 tackleInstance.release();
             }
 
-            void Start()
+            protected override void Awake() 
             {
+                base.Awake();
+
                 rb = GetComponent<Rigidbody2D>();
                 hitbox = GetComponent<Collider2D>();
                 hurtbox = GetComponentsInChildren<CircleCollider2D>()[1];
-                tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
+                joint = GetComponent<DistanceJoint2D>();
+            }
+
+            void Start()
+            {
+                joint.distance = DiceController.Instance.maxWireLength;
 
                 normalLayer = gameObject.layer;
                 tacklingLayer = LayerMask.NameToLayer(tacklingLayerName);
@@ -136,6 +149,9 @@ namespace AllBets
                 CinemachineVirtualCamera vcam1 = CameraController.Instance.frame1.vcam;
                 transposer = vcam1.GetCinemachineComponent<CinemachineFramingTransposer>();
                 lookaheadValue = transposer.m_LookaheadTime;
+
+                // Create the FMOD SFX instance
+                tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
             }
 
             void Update()
@@ -210,6 +226,38 @@ namespace AllBets
                         Destroy(transform.parent.gameObject);
                     }
                 }
+            }
+
+            public void TangleWireTo(Collider2D other) 
+            {
+                // If no entity is entangled, entangle the 'other'
+                if (entangledEntity == null)
+                {
+                    entangledEntity = other.gameObject;
+                    joint.connectedBody = other.attachedRigidbody;
+                }
+            }
+
+            public void Detangle()
+            {
+                // Reset pivot to player, and detangle die
+                entangledEntity = null;
+                joint.connectedBody = DiceController.Instance.rb;
+            }
+
+            public bool TryDetangle(GameObject entity)
+            {
+                // Try to detangle the given 'entity'
+                if (entangledEntity == entity)
+                {
+                    entangledEntity = null;
+                    joint.connectedBody = DiceController.Instance.rb;
+
+                    return true;
+                }
+
+                // If given 'entity' is not entangled, do nothing
+                return false;
             }
         #endregion
 

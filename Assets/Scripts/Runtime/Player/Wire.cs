@@ -17,6 +17,7 @@ namespace AllBets
         #region Variables & Switches
             Vector2 pivotPos;
             Vector2 diePos;
+            Vector2 playerPos;
             List<Vector2> positions;
         #endregion
         
@@ -33,9 +34,10 @@ namespace AllBets
                         
                         FMODUnity.RuntimeManager.PlayOneShot(sliceSFX);
                     }
-                    else
+                    else if (!DiceController.Instance.IsEntangled)
                     {
                         DiceController.Instance.TangleWireTo(other);
+                        PlayerController.Instance.TangleWireTo(other);
                     }
                 }
             }
@@ -52,10 +54,13 @@ namespace AllBets
             {
                 pivotPos = DiceController.Instance.pivot.position - transform.position;
                 diePos = DiceController.Instance.transform.position - transform.position;
+                playerPos = PlayerController.Instance.transform.position - transform.position;
 
                 positions.Clear();
                 positions.Add(diePos);
                 positions.Add(pivotPos);
+                if (DiceController.Instance.pivot != PlayerController.Instance.transform)
+                    positions.Add(playerPos);
 
                 hitbox.SetPoints(positions);
             }

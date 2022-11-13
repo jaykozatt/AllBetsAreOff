@@ -15,6 +15,7 @@ namespace AllBets
 
         #region Settings
         [Header("Settings")]
+            public float maxWireLength = 8;
             public float angularVelocity = 1;
             public float lengthRate = 1;
         #endregion
@@ -31,7 +32,7 @@ namespace AllBets
             private LineRenderer line;
             private List<Vector3> linePositions;
             
-            private Rigidbody2D rb;
+            public Rigidbody2D rb {get; private set;}
             public DistanceJoint2D joint {get; private set;}
             private new Collider2D collider;
             private new SpriteRenderer renderer;
@@ -314,7 +315,7 @@ namespace AllBets
             {
                 if (!IsDeployed) Deploy();
                 else joint.distance = 
-                    Mathf.Min(8, joint.distance + lengthRate * Time.deltaTime);
+                    Mathf.Min(maxWireLength, joint.distance + lengthRate * Time.deltaTime);
             }
 
             public void ShortenWire()
