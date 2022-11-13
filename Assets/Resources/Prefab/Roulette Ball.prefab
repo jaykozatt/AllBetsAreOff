@@ -187,7 +187,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 6200000, guid: c231bebf63a7cd6438afe2bd4f1a9ace, type: 2}
-  m_Interpolate: 0
+  m_Interpolate: 2
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -204,9 +204,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.57}
+  m_Offset: {x: 0, y: -0.25}
   serializedVersion: 2
-  m_Radius: 1
+  m_Radius: 1.27
 --- !u!114 &4545864071432670027
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,8 +233,8 @@ MonoBehaviour:
       Data3: -632040011
       Data4: -1813009865
     Path: event:/SFX/Pinball Bell
-  speedSqrThreshold: 200
-  defaultLayerName: Default
+  speedThreshold: 14
+  defaultLayerName: Indestructible
   movingLayerName: Moving Ball
   rb: {fileID: 0}
 --- !u!199 &4545864071432670026

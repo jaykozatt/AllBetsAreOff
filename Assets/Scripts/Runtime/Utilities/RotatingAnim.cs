@@ -7,7 +7,7 @@ namespace AllBets
 {
     public class RotatingAnim : MonoBehaviour
     {
-        RectTransform rectTransform;
+        // RectTransform transform;
         Sequence sequence;
 
         #region Settings
@@ -31,29 +31,29 @@ namespace AllBets
         {
             DOTween.Init();
             sequence = DOTween.Sequence();
-            rectTransform = transform as RectTransform;    
+            // transform = transform as RectTransform;    
         }
 
         // Start is called before the first frame update
         void Start()
         {
             sequence.Append(
-                rectTransform.DOLocalRotate(Vector3.forward * 180, rotationDuration)
+                transform.DOLocalRotate(Vector3.forward * 180, rotationDuration)
                     .SetEase(Ease.Linear)
                     .SetRelative()
             );
             sequence.Join(
-                rectTransform.DOScale(1.2f,scaleDuration)
+                transform.DOScale(2.6f,scaleDuration)
                     .SetLoops((int)(rotationDuration / scaleDuration),LoopType.Yoyo)
                     .SetEase(Ease.InOutSine)
             );
             sequence.Append(
-                rectTransform.DOLocalRotate(Vector3.forward * 180, rotationDuration)
+                transform.DOLocalRotate(Vector3.forward * 180, rotationDuration)
                     .SetEase(Ease.Linear)
                     .SetRelative()
             );
             sequence.Join(
-                rectTransform.DOScale(1.2f,scaleDuration)
+                transform.DOScale(2.6f,scaleDuration)
                     .SetLoops((int)(rotationDuration / scaleDuration),LoopType.Yoyo)
                     .SetEase(Ease.InOutSine)
             );

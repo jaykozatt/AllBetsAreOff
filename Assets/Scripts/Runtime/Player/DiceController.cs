@@ -46,6 +46,7 @@ namespace AllBets
             private int momentumFlipper = 1;
             private int dieNumber = 0;
             private bool isDeploying = false;
+            private float originalDrag;
         #endregion
 
         #region Properties
@@ -75,6 +76,7 @@ namespace AllBets
                 while (IsDeployed)
                 {
                     joint.distance = Mathf.Max(0, joint.distance - lengthRate * 4 * Time.deltaTime);
+                    if (rb.IsTouching(PlayerController.Instance.hitbox)) Pickup();
 
                     yield return null;
                 }
@@ -106,14 +108,14 @@ namespace AllBets
                 private void OnCollisionEnter2D(Collision2D other) 
                 {
                     // If 'other' is the player, and the die is not currently being deployed or entangled
-                    if (other.collider.CompareTag("Player") && !isDeploying && !IsEntangled)
-                    {
-                        Pickup();
-                    }
-                    else if (!other.collider.CompareTag("Player"))
+                    // if (other.collider.CompareTag("Player") && !isDeploying && !IsEntangled)
+                    // {
+                    //     Pickup();
+                    // }
+                    if (!other.collider.CompareTag("Player"))
                     {
                         // Make the die bounce away
-                        rb.velocity = other.relativeVelocity;
+                        // rb.velocity = other.relativeVelocity;
 
                         // If other is an enemy, knock a chip from the stack
                         Enemy enemy;
@@ -125,14 +127,14 @@ namespace AllBets
                     }   
                 }
 
-                private void OnCollisionStay2D(Collision2D other) 
-                {
-                    // If the die wasn't picked up on first contact, then it's picked up now on the next frame
-                    if (other.collider.CompareTag("Player") && !isDeploying && !IsEntangled)
-                    {
-                        Pickup();
-                    }
-                }
+                // private void OnCollisionStay2D(Collision2D other) 
+                // {
+                //     // If the die wasn't picked up on first contact, then it's picked up now on the next frame
+                //     if (other.collider.CompareTag("Player") && !isDeploying && !IsEntangled)
+                //     {
+                //         Pickup();
+                //     }
+                // }
 
                 private void OnDestroy() 
                 {
@@ -158,6 +160,8 @@ namespace AllBets
 
                 shadow = transform.parent.GetComponentInChildren<Shadow>();
                 shadow.caster = transform;
+
+                originalDrag = rb.drag;
             }
 
             void Start()
@@ -192,8 +196,8 @@ namespace AllBets
                 LayerMask mask = LayerMask.GetMask("Default");
                 if (!collider.IsTouchingLayers(mask))
                 {
-                    // Set linear drag back to 0
-                    rb.drag = 0;
+                    // Set linear drag back to its initial value
+                    rb.drag = originalDrag;
 
                     // While entangled, steadily reduce wire length to mimic a "wrap around" effect
                     if (IsEntangled) joint.distance = Mathf.Max(0, joint.distance - lengthRate * Time.deltaTime/2);
@@ -225,7 +229,7 @@ namespace AllBets
                 }
             }
 
-            void Pickup() 
+            public void Pickup() 
             {
                 // Hide everything related to the die and the wire
                 this.enabled = false;
@@ -234,6 +238,9 @@ namespace AllBets
                 line.enabled = false;
                 shadow.sprite.enabled = false;
                 afterimage.Stop();
+
+                joint.distance = 1;
+                Detangle();
             } 
 
             void Deploy()
@@ -282,6 +289,7 @@ namespace AllBets
                     entangledEntity = null;
                     pivot = Player.transform;
                     joint.connectedBody = Player.rb;
+                    Pickup();
 
                     return true;
                 }

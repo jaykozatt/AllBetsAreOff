@@ -13,6 +13,7 @@ namespace AllBets
             public int lives = 3;
             public int invincibilityFrames = 10;
             public float movingSpeed = 90;
+            public string tacklingLayerName = "Player Tackling";
         #endregion
 
         #region References
@@ -24,6 +25,7 @@ namespace AllBets
             #endregion
 
             [HideInInspector] public Rigidbody2D rb;
+            public Collider2D hitbox {get; private set;}
             private CircleCollider2D hurtbox;
             CinemachineFramingTransposer transposer;
             public Joystick joystick;
@@ -34,6 +36,8 @@ namespace AllBets
             Vector2 input;
             float lookaheadValue;
             bool isReeling = false;
+            int normalLayer;
+            int tacklingLayer;
         #endregion
 
         #region Coroutines References
@@ -49,16 +53,20 @@ namespace AllBets
                 
                 transposer.m_LookaheadTime = 0;
                 hurtbox.enabled = true;
+                gameObject.layer = tacklingLayer;
+                yield return new WaitForFixedUpdate();
 
                 // While still entangled, move towards target
                 Vector2 attackVector;
                 while (DiceController.Instance.IsEntangled)
                 {
                     attackVector = (target.position - transform.position).normalized;
-                    rb.velocity = attackVector * movingSpeed * 2;
+                    rb.AddForce(rb.mass * attackVector * movingSpeed/2, ForceMode2D.Impulse);
                     
-                    yield return null;
+                    yield return new WaitForFixedUpdate();
                 }
+
+                DiceController.Instance.Pickup();
 
                 // Expand the hurtbox 1.5x its normal range
                 // to mimic a shockwave after target impact
@@ -77,13 +85,22 @@ namespace AllBets
                 transposer.m_LookaheadTime = lookaheadValue;
                 hurtbox.radius = radius;
                 hurtbox.enabled = false;
+                gameObject.layer = normalLayer;
 
                 // Give the player a grace period to get their bearings back
                 framesUntilVulnerable = 20;
+                
+                yield return new WaitForFixedUpdate();
             }
         #endregion
 
         #region Monobehaviour Functions
+            private void OnCollisionEnter2D(Collision2D other) 
+            {
+                if (isReeling)
+                    DiceController.Instance.TryDetangle(other.gameObject);
+            }
+
             private void OnTriggerEnter2D(Collider2D other) 
             {
                 if (isReeling)
@@ -91,7 +108,7 @@ namespace AllBets
                     tackleInstance.start(); // Play tackle SFX
                     
                     // If the 'other' is entangled, then detangle.
-                    DiceController.Instance.TryDetangle(other.gameObject);
+                    // DiceController.Instance.TryDetangle(other.gameObject);
 
                     Enemy enemy; // Damage the 'other' if it's an enemy
                     if (other.TryGetComponent<Enemy>(out enemy))
@@ -108,8 +125,12 @@ namespace AllBets
             void Start()
             {
                 rb = GetComponent<Rigidbody2D>();
+                hitbox = GetComponent<Collider2D>();
                 hurtbox = GetComponentsInChildren<CircleCollider2D>()[1];
                 tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
+
+                normalLayer = gameObject.layer;
+                tacklingLayer = LayerMask.NameToLayer(tacklingLayerName);
 
                 // Cinemachine References
                 CinemachineVirtualCamera vcam1 = CameraController.Instance.frame1.vcam;

@@ -13,8 +13,8 @@ namespace AllBets
             [SerializeField] FMODUnity.EventReference chimeSFX;
         #endregion
 
-        public float speedSqrThreshold = 100;
-        public string defaultLayerName = "Default";
+        public float speedThreshold = 15;
+        private float speedSqrThreshold;
         private int defaultLayer;
         public string movingLayerName = "Moving";
         private int movingLayer;
@@ -28,6 +28,10 @@ namespace AllBets
 
         private void OnCollisionEnter2D(Collision2D other) 
         {
+            int tacklingLayer = LayerMask.NameToLayer("Player Tackling");
+            if (other.gameObject.layer == tacklingLayer || other.gameObject.layer == movingLayer)
+                gameObject.layer = movingLayer;
+
             Enemy enemy;
             if (other.gameObject.TryGetComponent<Enemy>(out enemy) && rb.velocity.sqrMagnitude > speedSqrThreshold)
             {
@@ -50,8 +54,10 @@ namespace AllBets
             if (balls == null) balls = new List<RouletteBall>();
             balls.Add(this);
 
-            defaultLayer = LayerMask.NameToLayer(defaultLayerName);
+            defaultLayer = gameObject.layer;
             movingLayer = LayerMask.NameToLayer(movingLayerName);
+
+            speedSqrThreshold = speedThreshold * speedThreshold;
         }
 
         private void Start() 
@@ -61,9 +67,7 @@ namespace AllBets
 
         private void Update() 
         {
-            if (rb.velocity.sqrMagnitude > speedSqrThreshold)
-                gameObject.layer = movingLayer;
-            else
+            if (rb.velocity.sqrMagnitude < speedSqrThreshold)
                 gameObject.layer = defaultLayer;
         }
     }

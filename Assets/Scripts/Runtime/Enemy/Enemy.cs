@@ -203,7 +203,7 @@ namespace AllBets
                 chipsInstance.setParameterByName("Number of chips", chipsOfDamage);
                 chipsInstance.start();
 
-                if (numberOfChips < 1 && gameObject != null) 
+                if (numberOfChips < 1) 
                 {
                     GameManager.Instance.IncreaseCombo();
                     
