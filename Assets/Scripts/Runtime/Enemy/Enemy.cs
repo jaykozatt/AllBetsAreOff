@@ -108,11 +108,7 @@ namespace AllBets
             private void OnDisable() 
             {
                 if (followAI != null) StopCoroutine(followAI);
-                if (DiceController.Instance != null)
-                {
-                    DiceController.Instance.TryDetangle(gameObject);    
-                    PlayerController.Instance.TryDetangle(gameObject);
-                }
+                Wire.Instance?.TryDetangle(gameObject);
             }
 
             private void OnDestroy()
@@ -128,10 +124,7 @@ namespace AllBets
                 slideInstance.release();
 
                 if (DiceController.Instance != null)
-                {
-                    DiceController.Instance.TryDetangle(gameObject);
-                    PlayerController.Instance.TryDetangle(gameObject);
-                }
+                    Wire.Instance.TryDetangle(gameObject);
             }
 
             private void Awake() 
@@ -165,61 +158,74 @@ namespace AllBets
         #region Core Functions
             public void Initialise()
             {
+                // Enable the correct number of chips in the stack
                 numberOfChips = startingChips;
-                for (int i=0; i<numberOfChips; i++)
+                for (int i=0; i<numberOfChips; i++) {
                     chipStack[i].gameObject.SetActive(true);
+                }
 
+                // Set its physics' properties
                 rb.mass = massPerChip * numberOfChips;
                 rb.drag = 5;
 
+                // Set the emission color used before an attack
                 lightSource.color = lightColor;
-                foreach (SpriteRenderer sprite in chipStack)
-                {
+                foreach (SpriteRenderer sprite in chipStack) {
                     sprite.material.SetColor("_EmissionColor", alertColor);
                 }
 
+                // Instance the FMOD SFXs
                 tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
                 chipsInstance = FMODUnity.RuntimeManager.CreateInstance(chipsSFX);
                 slideInstance = FMODUnity.RuntimeManager.CreateInstance(slideSFX);
 
+                // Restart its AI
                 if (followAI != null) StopCoroutine(followAI); 
                 followAI = StartCoroutine(FollowAI(PlayerController.Instance.transform));
             }
 
             public void GetDamaged(int chipsOfDamage)
             {
+                // Instantiate a score popup
                 TextPopup instance = Instantiate(scorePopup, transform.position, Quaternion.identity);
+                
+                // Get the VFX particle system used when toppling a stack
                 ParticleSystem.EmissionModule emission = toppleVFX.emission;
                 ParticleSystem.Burst burst = emission.GetBurst(0);
-                burst.count = chipsOfDamage;
 
+                // Set how many chips are gonna be lost visually
+                burst.count = chipsOfDamage;
                 emission.SetBurst(0, burst);
                 
-                int difference = numberOfChips-chipsOfDamage;
-                if (difference < 0)
+                // Compute leftover amount and set the origin position for the VFX, then play the effect
+                int leftover = numberOfChips-chipsOfDamage;
+                if (leftover < 0)
                     toppleVFX.transform.position = transform.position;
                 else
-                    toppleVFX.transform.position = chipStack[difference].transform.position;
+                    toppleVFX.transform.position = chipStack[leftover].transform.position;
                 toppleVFX.Play();
 
-                numberOfChips = Mathf.Max(0, difference);
+                // Clamp the leftover amount of chips 
+                numberOfChips = Mathf.Max(0, leftover);
                 chipStack[numberOfChips].gameObject.SetActive(false);
+                
+                // Add the score
                 GameManager.Instance.AddScore(chipsOfDamage * scorePerChip, instance);
 
+                // Play the toppling SFX according to the amount of chips toppled
                 chipsInstance.setParameterByName("Number of chips", chipsOfDamage);
                 chipsInstance.start();
 
+                // If stack is defeated, increase score multiplier and return stack to the pool
                 if (numberOfChips < 1) 
                 {
                     GameManager.Instance.IncreaseCombo();
                     
                     StopCoroutine(followAI);
                     EnemyPool.Instance.Despawn(gameObject);
-                    if (DiceController.Instance != null)
-                    {
-                        DiceController.Instance.TryDetangle(gameObject);
-                        PlayerController.Instance.TryDetangle(gameObject);
-                    }
+
+                    // Attempt to disentangle from wire if it was entangled.
+                    Wire.Instance.TryDetangle(gameObject);
                 }    
             }
         #endregion

@@ -7,7 +7,6 @@ namespace AllBets
 {
     public class RotatingAnim : MonoBehaviour
     {
-        // RectTransform transform;
         Sequence sequence;
 
         #region Settings
@@ -30,8 +29,7 @@ namespace AllBets
         private void Awake() 
         {
             DOTween.Init();
-            sequence = DOTween.Sequence();
-            // transform = transform as RectTransform;    
+            sequence = DOTween.Sequence(); 
         }
 
         // Start is called before the first frame update

@@ -122,6 +122,8 @@ namespace AllBets
                 string.Format("{00}:{1:00}", (int)timer / 60, (int)timer % 60);
             youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
             gameState = GameState.Ended;
+        
+            UpdateHighScore();
         }
 
         public void LoseGame()
@@ -132,6 +134,15 @@ namespace AllBets
                 string.Format("{00}:{1:00}", (int)timer / 60, (int)timer % 60);
             gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
             gameState = GameState.Ended;
+
+            UpdateHighScore();
+        }
+
+        void UpdateHighScore()
+        {
+            int highscore = PlayerPrefs.GetInt("highscore", 0);
+            if (highscore < score)
+                PlayerPrefs.SetInt("highscore", score);
         }
     }
 }

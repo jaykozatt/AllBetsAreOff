@@ -1,8 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
-using DG.Tweening;
 
 namespace AllBets
 {
@@ -24,8 +22,6 @@ namespace AllBets
                 private FMOD.Studio.EventInstance tackleInstance;
             #endregion
 
-            
-            public GameObject entangledEntity {get; private set;}
             [HideInInspector] public Rigidbody2D rb;
             public Collider2D hitbox {get; private set;}
             private CircleCollider2D hurtbox;
@@ -52,7 +48,7 @@ namespace AllBets
             IEnumerator ReelCrash() // Sequence that makes the character tackle an entangled entity
             {
                 // Get the target that will be tackled
-                Transform target = DiceController.Instance.entangledEntity.transform;
+                Transform target = Wire.Instance.entangledEntity.transform;
                 
                 transposer.m_LookaheadTime = 0;
                 hurtbox.enabled = true;
@@ -61,7 +57,7 @@ namespace AllBets
 
                 // While still entangled, move towards target
                 Vector2 attackVector;
-                while (DiceController.Instance.IsEntangled)
+                while (Wire.Instance.IsEntangled)
                 {
                     attackVector = (target.position - transform.position).normalized;
                     rb.AddForce(rb.mass * attackVector * movingSpeed/2, ForceMode2D.Impulse);
@@ -102,8 +98,7 @@ namespace AllBets
             {
                 if (isReeling)
                 {
-                    DiceController.Instance.TryDetangle(other.gameObject);
-                    TryDetangle(other.gameObject);
+                    Wire.Instance.TryDetangle(other.gameObject);
                 }
             }
 
@@ -112,9 +107,6 @@ namespace AllBets
                 if (isReeling)
                 {
                     tackleInstance.start(); // Play tackle SFX
-                    
-                    // If the 'other' is entangled, then detangle.
-                    // DiceController.Instance.TryDetangle(other.gameObject);
 
                     Enemy enemy; // Damage the 'other' if it's an enemy
                     if (other.TryGetComponent<Enemy>(out enemy))
@@ -160,9 +152,6 @@ namespace AllBets
 
                 // Tick invincibility freames        
                 framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - 1);
-
-                // Switch to wider frame of view when entangled
-                CameraController.Instance.frame2.SetActive(DiceController.Instance.IsEntangled);
             }
 
             private void FixedUpdate() 
@@ -228,43 +217,21 @@ namespace AllBets
                 }
             }
 
-            public void TangleWireTo(Collider2D other) 
+            public void JoinTo(Collider2D other) 
             {
-                // If no entity is entangled, entangle the 'other'
-                if (entangledEntity == null)
-                {
-                    entangledEntity = other.gameObject;
-                    joint.connectedBody = other.attachedRigidbody;
-                }
+                joint.connectedBody = other.attachedRigidbody;
             }
 
-            public void Detangle()
+            public void ResetJoint()
             {
-                // Reset pivot to player, and detangle die
-                entangledEntity = null;
                 joint.connectedBody = DiceController.Instance.rb;
-            }
-
-            public bool TryDetangle(GameObject entity)
-            {
-                // Try to detangle the given 'entity'
-                if (entangledEntity == entity)
-                {
-                    entangledEntity = null;
-                    joint.connectedBody = DiceController.Instance.rb;
-
-                    return true;
-                }
-
-                // If given 'entity' is not entangled, do nothing
-                return false;
             }
         #endregion
 
         #region Event Functions
             public void OnShortenKeyPress() 
             {
-                if (!DiceController.Instance.IsEntangled)
+                if (!Wire.Instance.IsEntangled)
                 {
                     float wireLength = DiceController.Instance.joint.distance;
                     if (wireLength > 3) 
@@ -284,7 +251,7 @@ namespace AllBets
 
             public void OnLengthenKeyPress()
             {
-                if (!DiceController.Instance.IsEntangled)
+                if (!Wire.Instance.IsEntangled)
                     DiceController.Instance.LengthenWire();
             }
         #endregion

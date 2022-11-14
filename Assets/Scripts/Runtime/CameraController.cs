@@ -58,6 +58,10 @@ namespace AllBets
 
         private void Update() 
         {
+            frame2.SetActive(
+                Wire.Instance.IsEntangled
+            );
+
             // Enable frame3 whenever a roulette ball surpasses its speed threshold
             frame3.SetActive(
                 RouletteBall.AnyIsBouncing

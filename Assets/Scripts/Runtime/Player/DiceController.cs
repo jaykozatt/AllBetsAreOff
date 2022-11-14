@@ -1,8 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
-using Cinemachine;
 
 namespace AllBets
 {
@@ -28,9 +25,6 @@ namespace AllBets
             #endregion
 
             public Transform pivot {get; private set;}
-            public GameObject entangledEntity {get; private set;}
-            private LineRenderer line;
-            private List<Vector3> linePositions;
             
             public Rigidbody2D rb {get; private set;}
             public DistanceJoint2D joint {get; private set;}
@@ -46,7 +40,6 @@ namespace AllBets
         #region Variables & Switches
             private int momentumFlipper = 1;
             private int dieNumber = 0;
-            private bool isDeploying = false;
             private float originalDrag;
         #endregion
 
@@ -54,9 +47,7 @@ namespace AllBets
             PlayerController Player {
                 get => PlayerController.Instance;
             }
-            public bool IsEntangled {
-                get => entangledEntity != null;
-            }
+            
             public bool IsDeployed {
                 get => this.enabled;
             }
@@ -83,13 +74,6 @@ namespace AllBets
                 }
             }
 
-            IEnumerator DeployTimer()
-            {
-                isDeploying = true;
-                yield return new WaitForSeconds(0.25f);
-                isDeploying = false;
-            }
-
             IEnumerator DiceCycler()
             {
                 // Change the die's sprite every second
@@ -108,16 +92,8 @@ namespace AllBets
             #region Events
                 private void OnCollisionEnter2D(Collision2D other) 
                 {
-                    // If 'other' is the player, and the die is not currently being deployed or entangled
-                    // if (other.collider.CompareTag("Player") && !isDeploying && !IsEntangled)
-                    // {
-                    //     Pickup();
-                    // }
                     if (!other.collider.CompareTag("Player"))
                     {
-                        // Make the die bounce away
-                        // rb.velocity = other.relativeVelocity;
-
                         // If other is an enemy, knock a chip from the stack
                         Enemy enemy;
                         if (other.gameObject.TryGetComponent<Enemy>(out enemy))
@@ -127,15 +103,6 @@ namespace AllBets
                         FMODUnity.RuntimeManager.PlayOneShot(impactSFX);
                     }   
                 }
-
-                // private void OnCollisionStay2D(Collision2D other) 
-                // {
-                //     // If the die wasn't picked up on first contact, then it's picked up now on the next frame
-                //     if (other.collider.CompareTag("Player") && !isDeploying && !IsEntangled)
-                //     {
-                //         Pickup();
-                //     }
-                // }
 
                 private void OnDestroy() 
                 {
@@ -148,8 +115,6 @@ namespace AllBets
             {
                 base.Awake();
 
-                line = GetComponent<LineRenderer>();
-                linePositions = new List<Vector3>();
                 dieSprites = Resources.LoadAll<Sprite>("Sprites/Dice");
 
                 joint = GetComponentInParent<DistanceJoint2D>();
@@ -175,12 +140,12 @@ namespace AllBets
             {
                 CheckPivot();
                 SwingDie();
-                DrawWire();
-                afterimageMain.startRotationZ = transform.localEulerAngles.z;
+                UpdateAfterimage();
             }
         #endregion
 
         #region Core Functions
+            void UpdateAfterimage() => afterimageMain.startRotationZ = transform.localEulerAngles.z;
             void CheckPivot()
             {
                 // Make sure that there's always a pivot to swing around of
@@ -201,7 +166,7 @@ namespace AllBets
                     rb.drag = originalDrag;
 
                     // While entangled, steadily reduce wire length to mimic a "wrap around" effect
-                    if (IsEntangled) joint.distance = Mathf.Max(0, joint.distance - lengthRate * Time.deltaTime/2);
+                    if (Wire.Instance.IsEntangled) joint.distance = Mathf.Max(0, joint.distance - lengthRate * Time.deltaTime/2);
                     
                     // Compute radial vector (non-normalised and pointing inwards) 
                     // & centripetal acceleration magnitude
@@ -236,12 +201,12 @@ namespace AllBets
                 this.enabled = false;
                 renderer.enabled = false;
                 collider.enabled = false;
-                line.enabled = false;
+                Wire.Instance.line.enabled = false;
                 shadow.sprite.enabled = false;
                 afterimage.Stop();
 
                 joint.distance = 1;
-                Detangle();
+                ResetJoint();
             } 
 
             void Deploy()
@@ -250,65 +215,27 @@ namespace AllBets
                 this.enabled = true;
                 renderer.enabled = true;
                 collider.enabled = true;
-                line.enabled = true;
+                Wire.Instance.line.enabled = true;
                 shadow.sprite.enabled = true;
                 afterimage.Play();    
 
                 // Set wire length to 3 units, and update its graphic
                 joint.distance = 3;
-                DrawWire();
-
-                // Block further pickups for a set amount of time
-                StartCoroutine(DeployTimer());
+                Wire.Instance.DrawWire();
             }
 
-            public void TangleWireTo(Collider2D other) 
+            public void JoinTo(Collider2D other) 
             {
-                // If no entity is entangled, entangle the 'other'
-                if (entangledEntity == null)
-                {
-                    entangledEntity = other.gameObject;
-                    pivot = entangledEntity.transform;
-                    joint.connectedBody = other.attachedRigidbody;
-                    joint.distance = ((Vector2)(transform.position - other.transform.position)).magnitude;
-                }
+                pivot = other.transform;
+                joint.connectedBody = other.attachedRigidbody;
+                joint.distance = ((Vector2)(transform.position - other.transform.position)).magnitude;
             }
 
-            public void Detangle()
+            public void ResetJoint()
             {
                 // Reset pivot to player, and detangle die
-                entangledEntity = null;
                 pivot = Player.transform;
                 joint.connectedBody = Player.rb;
-            }
-
-            public bool TryDetangle(GameObject entity)
-            {
-                // Try to detangle the given 'entity'
-                if (entangledEntity == entity)
-                {
-                    entangledEntity = null;
-                    pivot = Player.transform;
-                    joint.connectedBody = Player.rb;
-                    Pickup();
-
-                    return true;
-                }
-
-                // If given 'entity' is not entangled, do nothing
-                return false;
-            }
-
-            void DrawWire()
-            {
-                linePositions.Clear();
-                
-                linePositions.Add(PlayerController.Instance.transform.position);
-                if (entangledEntity) linePositions.Add(entangledEntity.transform.position);
-                linePositions.Add(transform.position);
-
-                line.positionCount = linePositions.Count;
-                line.SetPositions(linePositions.ToArray());
             }
 
             public void LengthenWire()

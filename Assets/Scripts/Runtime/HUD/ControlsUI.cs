@@ -21,18 +21,20 @@ namespace AllBets
             public TextMeshProUGUI shift;
             public Image spaceKey;
             public TextMeshProUGUI space;
-            private DiceController dice;
+            private DiceController die;
+            private Wire wire;
         #endregion
 
         #region Monobehaviour Functions
             void Start()
             {
-                dice = DiceController.Instance;
+                die = DiceController.Instance;
+                wire = Wire.Instance;
             }
 
             void Update()
             {
-                if (dice.IsDeployed) 
+                if (die.IsDeployed) 
                 {
                     space.text = "Lengthen";
                     spaceKey.color = normalColor;
@@ -43,7 +45,7 @@ namespace AllBets
                     spaceKey.color = highlight;
                 } 
 
-                if (dice.IsEntangled) 
+                if (wire.IsEntangled) 
                 {
                     shift.text = "Tackle";
                     shiftKey.color = highlight;

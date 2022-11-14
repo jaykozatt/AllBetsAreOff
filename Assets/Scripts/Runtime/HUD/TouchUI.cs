@@ -19,6 +19,7 @@ namespace AllBets
             public Image shiftKey;
             public Image spaceKey;
             private DiceController die;
+            private Wire wire;
         #endregion
 
         #region Coroutine References
@@ -44,6 +45,7 @@ namespace AllBets
             void Start()
             {
                 die = DiceController.Instance;
+                wire = Wire.Instance;
                 // flashRoutine = StartCoroutine(Flash());
             }
 
@@ -54,7 +56,7 @@ namespace AllBets
                 else spaceKey.color = normalColor;
 
                 // If the die is entangled, highlight the tackle button
-                if (die.IsEntangled) shiftKey.color = highlightColor;
+                if (wire.IsEntangled) shiftKey.color = highlightColor;
                 else shiftKey.color = normalColor;
             }
         #endregion
