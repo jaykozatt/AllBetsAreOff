@@ -13,7 +13,6 @@ namespace AllBets
         [Header("Settings")]
             public float impulseForce = 5; // The force applied to make it move on short bursts
             public int scorePerChip = 100; // Score value of each chip on the chipStack
-            public int massPerChip = 2;
             public Color lightColor = Color.yellow;
             [ColorUsage(false,true)] public Color alertColor; // A flash of color when about to attack
 
@@ -105,6 +104,13 @@ namespace AllBets
                 }
             }
 
+            private void OnCollisionStay2D(Collision2D other) 
+            {
+                if (other.collider.CompareTag("Player") && isAttacking)
+                {
+                    PlayerController.Instance.GetHurt();
+                }
+            }
             private void OnDisable() 
             {
                 if (followAI != null) StopCoroutine(followAI);
@@ -135,17 +141,20 @@ namespace AllBets
                 chipStack.Remove(lightSource);
                 chipStack.RemoveAt(chipStack.Count-1);
 
-                string particlesPath = "/Managers/ParticleSystems/";
+                string particlesPath = "/Gameplay/Managers/ParticleSystems/";
                 string topplePath = particlesPath + (CompareTag("Wrap Immune") ? "Blue Enemy" : "Purple Enemy");
 
                 toppleVFX = GameObject.Find(topplePath).GetComponent<ParticleSystem>();
+                startingChips = chipStack.Where(chip => chip.gameObject.activeInHierarchy).Count();
             }
 
             // Start is called before the first frame update
             void Start()
             {
-                startingChips = chipStack.Where(chip => chip.gameObject.activeInHierarchy).Count();
-                Initialise();
+                // Instance the FMOD SFXs
+                tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
+                chipsInstance = FMODUnity.RuntimeManager.CreateInstance(chipsSFX);
+                slideInstance = FMODUnity.RuntimeManager.CreateInstance(slideSFX);
             }
 
             void Update() 
@@ -156,28 +165,21 @@ namespace AllBets
         #endregion
 
         #region Core Functions
-            public void Initialise()
+            public void Initialise(Vector3 position)
             {
+                transform.position = position;
+
                 // Enable the correct number of chips in the stack
                 numberOfChips = startingChips;
                 for (int i=0; i<numberOfChips; i++) {
                     chipStack[i].gameObject.SetActive(true);
                 }
 
-                // Set its physics' properties
-                rb.mass = massPerChip * numberOfChips;
-                rb.drag = 5;
-
                 // Set the emission color used before an attack
                 lightSource.color = lightColor;
                 foreach (SpriteRenderer sprite in chipStack) {
                     sprite.material.SetColor("_EmissionColor", alertColor);
                 }
-
-                // Instance the FMOD SFXs
-                tackleInstance = FMODUnity.RuntimeManager.CreateInstance(tackleSFX);
-                chipsInstance = FMODUnity.RuntimeManager.CreateInstance(chipsSFX);
-                slideInstance = FMODUnity.RuntimeManager.CreateInstance(slideSFX);
 
                 // Restart its AI
                 if (followAI != null) StopCoroutine(followAI); 

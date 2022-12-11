@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace AllBets
 {
@@ -20,10 +18,10 @@ namespace AllBets
             public int totalSeconds {get=>60*minutes+seconds;}
         }
 
-        [SerializeField] int score = 0;
+        int score = 0;
         public TimeSpan survivalTime;
         private float timer;
-        public GameState gameState = GameState.Initialized;
+        public GameState gameState {get; private set;}
         public float timeUntilComboReset = 5;
         public float comboTimer {get; private set;}
 
@@ -37,6 +35,7 @@ namespace AllBets
         public GameObject youWinDisplay;
         public GameObject pauseDisplay;
         public GameObject gameUI;
+        public GameObject controlsUI;
 
         public Action<int> OnComboUpdate;
 
@@ -70,10 +69,13 @@ namespace AllBets
 
         public void AddScore(int points, TextPopup popup)
         {
-            score += points * comboMultiplier;
-            popup.text = (points * comboMultiplier).ToString();
-            comboTimer = timeUntilComboReset;
-            OnComboUpdate?.Invoke(comboMultiplier);
+            if (gameState != GameState.Ended)
+            {
+                score += points * comboMultiplier;
+                popup.text = (points * comboMultiplier).ToString();
+                comboTimer = timeUntilComboReset;
+                OnComboUpdate?.Invoke(comboMultiplier);
+            }
         }
 
         public void IncreaseCombo()
@@ -87,7 +89,14 @@ namespace AllBets
 
         public void Reset() 
         {
-            SceneManager.LoadScene(0);
+            SceneLoader.Instance?.TryLoadScene(Scene.ClassicMode);
+            if (gameState == GameState.Paused) ResumeGame();
+        }
+
+        public void ReturnToMenu() 
+        {
+            SceneLoader.Instance?.TryLoadScene(Scene.MainMenu);
+            if (gameState == GameState.Paused) ResumeGame();
         }
 
         public void BeginGame()
@@ -104,6 +113,7 @@ namespace AllBets
             Time.timeScale = 0;
             pauseDisplay.SetActive(true);
             // gameUI.SetActive(false);
+            controlsUI.SetActive(false);
         }
 
         public void ResumeGame()
@@ -112,37 +122,62 @@ namespace AllBets
             Time.timeScale = 1;
             pauseDisplay.SetActive(false);
             // gameUI.SetActive(true);
+            controlsUI.SetActive(true);
         }
 
         public void WinGame()
         {
-            gameUI.SetActive(false);
+            // gameUI.SetActive(false);
+            controlsUI.SetActive(false);
             youWinDisplay.SetActive(true);
-            youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[0].text = 
-                string.Format("{00}:{1:00}", (int)timer / 60, (int)timer % 60);
-            youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
+
+            int highscore;
+            if (TryUpdateHighscore(out highscore))
+                youWinDisplay.GetComponentsInChildren<Image>()[2].gameObject.SetActive(true);
+            else
+                youWinDisplay.GetComponentsInChildren<Image>()[2].gameObject.SetActive(false);
+
+            youWinDisplay.GetComponentsInChildren<TextMeshProUGUI>()[1].text = 
+                $"<size=80%>Highscore:</size> {highscore}";
             gameState = GameState.Ended;
         
-            UpdateHighScore();
         }
 
         public void LoseGame()
         {
-            gameUI.SetActive(false);
+            // gameUI.SetActive(false);
+            controlsUI.SetActive(false);
             gameOverDisplay.SetActive(true);
-            gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[0].text = 
-                string.Format("{00}:{1:00}", (int)timer / 60, (int)timer % 60);
-            gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[2].text = $"Score: {score}";
+
+            int highscore;
+            if (TryUpdateHighscore(out highscore))
+                gameOverDisplay.GetComponentsInChildren<Image>()[2].gameObject.SetActive(true);
+            else
+                gameOverDisplay.GetComponentsInChildren<Image>()[2].gameObject.SetActive(false);
+
+            gameOverDisplay.GetComponentsInChildren<TextMeshProUGUI>()[1].text = 
+                $"<size=80%>Highscore:</size> {highscore}";
             gameState = GameState.Ended;
 
-            UpdateHighScore();
         }
 
-        void UpdateHighScore()
+        bool TryUpdateHighscore(out int highscore)
         {
-            int highscore = PlayerPrefs.GetInt("highscore", 0);
-            if (highscore < score)
-                PlayerPrefs.SetInt("highscore", score);
+            // Get current highscore
+            highscore = PlayerPrefs.GetInt("highscore", 0);
+            
+            // Compare with current score
+            if (highscore < score) 
+            {
+                // Save the new highscore
+                PlayerPrefs.SetInt("highscore", highscore);
+                highscore = score;
+
+                return true;
+            }
+
+            return false;
+
         }
     }
 }

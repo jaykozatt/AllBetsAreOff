@@ -5,15 +5,9 @@ using UnityEngine;
 namespace AllBets
 {
     public class EnemySpawner : MonoBehaviour
-    {
-        #region Settings
-        [Header("Settings")]
-            [SerializeField] int spawnInterval = 12;
-        #endregion
-        
+    {   
         #region References
             private Camera cam;
-            private GameObject actors;
             private GameObject[] enemies;
         #endregion
 
@@ -22,16 +16,14 @@ namespace AllBets
         #endregion
 
         #region Coroutine Definitions
-            IEnumerator Spawner(int interval)
+            IEnumerator Spawner()
             {
-                Vector2 point;
                 while (GameManager.Instance.gameState < GameState.Ended)
                 {
                     if (GameManager.Instance.gameState == GameState.Playing)
                     {
                         // If the spawner is outside of the player's field of view
-                        point = cam.WorldToViewportPoint(transform.position);
-                        if (point.x < 0 || point.x > 1 || point.y < 0 && point.y > 1)
+                        if (CameraController.Instance.IsWatching(transform.position))
                         {
                             GameObject instance; // Wait for a time interval after spawning a new enemy
                             if (EnemyPool.Instance.TrySpawnAt(transform.position, out instance))
@@ -63,11 +55,10 @@ namespace AllBets
             private void Awake() {
                 cam = Camera.main;
                 enemies = Resources.LoadAll<GameObject>("Prefab/Enemies");
-                actors = GameObject.Find("/Actors");
             }
 
             private void Start() {
-                spawner = StartCoroutine(Spawner(spawnInterval));
+                spawner = StartCoroutine(Spawner());
             }
         #endregion
 

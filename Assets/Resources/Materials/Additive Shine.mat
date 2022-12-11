@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HDR Shine
+  m_Name: Additive Shine
   m_Shader: {fileID: -6465566751694194690, guid: a724adaef86a4d84cb751e556db2d82a, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -35,7 +35,9 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    m_Floats: []
+    m_Floats:
+    - _RotationEnabled: 0
+    - _RotationRate: 0.25
     m_Colors:
     - Color_8af217a3a8ca42f9bbc936a6d4aa9962: {r: 2.9960785, g: 0.6117647, b: 0.0627451, a: 1}
   m_BuildTextureStacks: []

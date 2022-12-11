@@ -31,12 +31,10 @@ namespace AllBets
         List<Vector2> boundingPositions;
         Vector3[] viewportCorners;
 
-        protected override void Awake() 
+        private void Start() 
         {
-            base.Awake();
-            
             cam = Camera.main;
-            boundingCollider = GetComponentInChildren<EdgeCollider2D>();
+            boundingCollider = cam.GetComponent<EdgeCollider2D>();
             CinemachineVirtualCamera[] vcams = GetComponentsInChildren<CinemachineVirtualCamera>();
             
             boundingPositions = new List<Vector2>(5);
@@ -51,23 +49,26 @@ namespace AllBets
             frame2.vcam = vcams[1];
             frame3.vcam = vcams[2];
 
-            frame1.SetActive();
+            frame1.SetActive(true);
             frame2.SetActive(false);
             frame3.SetActive(false);
+            
         }
 
         private void Update() 
         {
-            frame2.SetActive(
-                Wire.Instance.IsEntangled
-            );
+            if (Wire.Instance != null)
+                frame2.SetActive(
+                    Wire.Instance.IsEntangled
+                );
 
             // Enable frame3 whenever a roulette ball surpasses its speed threshold
-            frame3.SetActive(
-                RouletteBall.AnyIsBouncing
-            );
+            if (RouletteBall.ballList.Count > 0)
+                frame3.SetActive(
+                    RouletteBall.AnyIsBouncing
+                );
 
-            // Update the bounding box collider
+            // Update the viewport bounds box collider
             for (int i = 0; i< boundingPositions.Count; i++)
             {
                 boundingPositions[i] = cam.ViewportToWorldPoint(viewportCorners[i]);
@@ -75,7 +76,7 @@ namespace AllBets
             boundingCollider.SetPoints(boundingPositions);
         }
 
-        public bool IsSeeing(Vector3 position)
+        public bool IsWatching(Vector3 position)
         {
             Vector3 point = cam.WorldToViewportPoint(position);
 

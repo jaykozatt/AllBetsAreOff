@@ -28,7 +28,7 @@ namespace AllBets
             base.Awake();
             titleGroup = GetComponentInChildren<CanvasGroup>();
             missionGroup.gameObject.SetActive(true);
-            missionGroup.alpha = 0;
+            // missionGroup.alpha = 0;
             // pressAnyKeyText = GetComponentsInChildren<TextMeshProUGUI>()[1];
         }
 
@@ -52,6 +52,10 @@ namespace AllBets
 
         IEnumerator MainTitle()
         {
+            #if UNITY_ANDROID || UNITY_IOS 
+                pressAnyKeyText.text = "Tap anywhere to begin...";
+            #endif
+
             Coroutine flasher = StartCoroutine(Flasher(pressAnyKeyText));
             Tween tween;
 
@@ -61,14 +65,14 @@ namespace AllBets
 
             }
 
-            StopCoroutine(flasher);
-            tween = titleGroup.DOFade(0,fadeDuration);
-            tween = shine.DOFade(0,fadeDuration);
-            while (tween.IsPlaying()) yield return null;
+            // tween = titleGroup.DOFade(0,fadeDuration);
+            // // tween = shine.DOFade(0,fadeDuration);
+            // while (tween.IsPlaying()) yield return null;
 
-            tween = missionGroup.DOFade(1,fadeDuration);
-            while (tween.IsPlaying()) yield return null;
-            yield return new WaitForSeconds(secondsUntilFade);
+            // tween = missionGroup.DOFade(1,fadeDuration);
+            // while (tween.IsPlaying()) yield return null;
+            // yield return new WaitForSeconds(secondsUntilFade);
+            StopCoroutine(flasher);
 
             tween = missionGroup.DOFade(0,fadeDuration);
             while (tween.IsPlaying()) yield return null;

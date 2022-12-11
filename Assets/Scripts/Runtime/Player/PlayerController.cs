@@ -102,7 +102,26 @@ namespace AllBets
                 }
             }
 
+            private void OnCollisionStay2D(Collision2D other) 
+            {
+                if (isReeling)
+                {
+                    Wire.Instance.TryDetangle(other.gameObject);
+                }
+            }
             private void OnTriggerEnter2D(Collider2D other) 
+            {
+                if (isReeling)
+                {
+                    tackleInstance.start(); // Play tackle SFX
+
+                    Enemy enemy; // Damage the 'other' if it's an enemy
+                    if (other.TryGetComponent<Enemy>(out enemy))
+                        enemy.GetDamaged(enemy.numberOfChips);
+                }
+            }
+
+            private void OnTriggerStay2D(Collider2D other) 
             {
                 if (isReeling)
                 {

@@ -7,7 +7,8 @@ namespace AllBets
 {
     public class RotatingAnim : MonoBehaviour
     {
-        Sequence sequence;
+        Tween scaleTween;
+        Material material;
 
         #region Settings
             public float rotationDuration = 20;
@@ -15,48 +16,30 @@ namespace AllBets
         #endregion
 
         private void OnDestroy() {
-            sequence.Kill();
+            scaleTween.Kill();
         }
 
         private void OnEnable() {
-            if (sequence != null) sequence.Play();
+            if (scaleTween != null) scaleTween.Play();
         }
 
         private void OnDisable() {
-            sequence.Pause();
+            scaleTween.Pause();
         }
 
         private void Awake() 
         {
             DOTween.Init();
-            sequence = DOTween.Sequence(); 
+            material = GetComponent<SpriteRenderer>().material;
         }
 
-        // Start is called before the first frame update
         void Start()
         {
-            sequence.Append(
-                transform.DOLocalRotate(Vector3.forward * 180, rotationDuration)
-                    .SetEase(Ease.Linear)
-                    .SetRelative()
-            );
-            sequence.Join(
-                transform.DOScale(2.6f,scaleDuration)
-                    .SetLoops((int)(rotationDuration / scaleDuration),LoopType.Yoyo)
-                    .SetEase(Ease.InOutSine)
-            );
-            sequence.Append(
-                transform.DOLocalRotate(Vector3.forward * 180, rotationDuration)
-                    .SetEase(Ease.Linear)
-                    .SetRelative()
-            );
-            sequence.Join(
-                transform.DOScale(2.6f,scaleDuration)
-                    .SetLoops((int)(rotationDuration / scaleDuration),LoopType.Yoyo)
-                    .SetEase(Ease.InOutSine)
-            );
-
-            sequence.SetLoops(-1);
+            material.SetInt("_RotationEnabled", 1);
+            transform.DOScale(2.6f,scaleDuration)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.InOutSine)
+            ;
         }
     }
 }

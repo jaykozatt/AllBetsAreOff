@@ -13,11 +13,20 @@ namespace AllBets
                 public int maxCount;
                 public Enemy enemy;
             }
+            [System.Serializable]
+            public struct GracePeriod
+            {
+                public float timeBonus;
+                public float remainingDuration;
+
+            }
         #endregion
 
         #region Settings
         [Header("Settings")]
             public Vector2 intervalRange; // The max and min intervals between spawns
+            public float gracePeriodDuration = 60; // 60 seconds
+
         #endregion
 
         #region References
@@ -27,8 +36,7 @@ namespace AllBets
         #endregion
         
         #region Variables & Switches
-            float gracePeriodBonus; // a bonus to the spawn interval that diminishes with time.
-            float gracePeriodDuration = 60; // 60 seconds
+            GracePeriod gracePeriod; // a bonus to the spawn interval that diminishes with time.
             int populationCount = 0;
             public int maxPopulation {get; private set;}
         #endregion
@@ -40,9 +48,18 @@ namespace AllBets
                 // as it closes in towards the population cap. 
                 get => 
                     intervalRange.x + 
-                    gracePeriodBonus + 
+                    gracePeriod.timeBonus + 
                     (intervalRange.y - intervalRange.x) * 
                         Mathf.Pow(populationCount/maxPopulation, 2)
+                ;
+            }
+            private bool CanSpawn {
+                // Limit the population capacity to a third of the total
+                // for the duration of the grace period
+                get =>
+                    gracePeriod.remainingDuration > 0 ?
+                        populationCount < maxPopulation / 3 :
+                        populationCount < maxPopulation
                 ;
             }
         #endregion
@@ -72,24 +89,29 @@ namespace AllBets
                     maxPopulation += template.maxCount;
                 }
                 
-                gracePeriodBonus = intervalRange.y - intervalRange.x;
+                gracePeriod.timeBonus = intervalRange.y - intervalRange.x;
+                gracePeriod.remainingDuration = gracePeriodDuration;
             }
 
             private void Update() 
             {
-                // Diminish the grace period bonus over the course of 10 x gracePeriodBonus seconds
-                gracePeriodBonus = Mathf.Max(0, gracePeriodBonus - .1f * Time.deltaTime);
+                // Diminish the grace period bonus linearly over the course of {gracePeriodDuration} seconds
+                gracePeriod.remainingDuration = Mathf.Max(0,gracePeriod.remainingDuration - Time.deltaTime);
+                gracePeriod.timeBonus = Mathf.Lerp(0,
+                    intervalRange.y - intervalRange.x,
+                    gracePeriod.remainingDuration / gracePeriodDuration
+                );
+
             }
         #endregion
 
         public bool TrySpawnAt(Vector3 pos, out GameObject instance)
         {
-            if (populationCount < maxPopulation)
+            if (CanSpawn)
             {
                 instance = pool[Random.Range(0,pool.Count)];
-                instance.transform.position = pos;
                 instance.SetActive(true);
-                instance.GetComponent<Enemy>().Initialise();
+                instance.GetComponent<Enemy>().Initialise(pos);
                 
                 populationCount++;
                 pool.Remove(instance);

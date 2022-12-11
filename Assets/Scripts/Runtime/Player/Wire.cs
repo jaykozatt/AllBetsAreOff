@@ -43,7 +43,7 @@ namespace AllBets
                 if (DiceController.Instance.IsDeployed)
                 {
                     Enemy enemy; // Enemies tagged as 'Wrap Immune' are sliced instead of entangled
-                    if (other.TryGetComponent<Enemy>(out enemy) && other.CompareTag("Wrap Immune"))
+                    if (other.TryGetComponent<Enemy>(out enemy) && (other.CompareTag("Wrap Immune") || IsEntangled))
                     {
                         int damage = Mathf.Max(1, enemy.numberOfChips / 2);
                         enemy.GetDamaged(damage);

@@ -645,7 +645,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   impulseForce: 20
   scorePerChip: 100
-  massPerChip: 1000
   lightColor: {r: 1, g: 0.9771408, b: 0.7028302, a: 0.29803923}
   alertColor: {r: 4.1549506, g: 2.520638, b: 0.33318007, a: 1}
   tackleSFX:
@@ -683,7 +682,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 50
+  m_Mass: 1000
   m_LinearDrag: 5
   m_AngularDrag: 0.05
   m_GravityScale: 0
