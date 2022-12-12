@@ -10,8 +10,6 @@ namespace AllBets
     public class MissionText : StaticInstance<MissionText>
     {
         public float fadeDuration = .5f;
-        public int secondsUntilFade = 5;
-        public SpriteRenderer shine;
         public CanvasGroup titleGroup;
         public CanvasGroup missionGroup;
         public TextMeshProUGUI pressAnyKeyText;
@@ -28,8 +26,6 @@ namespace AllBets
             base.Awake();
             titleGroup = GetComponentInChildren<CanvasGroup>();
             missionGroup.gameObject.SetActive(true);
-            // missionGroup.alpha = 0;
-            // pressAnyKeyText = GetComponentsInChildren<TextMeshProUGUI>()[1];
         }
 
         private void Start() 
@@ -37,7 +33,7 @@ namespace AllBets
             mainTitleRoutine = StartCoroutine(MainTitle());
         }
 
-        IEnumerator Flasher(TextMeshProUGUI text) 
+        IEnumerator Blinker(TextMeshProUGUI text) 
         {
             WaitForSeconds wait1second = new WaitForSeconds(1);
             while (true) 
@@ -56,7 +52,7 @@ namespace AllBets
                 pressAnyKeyText.text = "Tap anywhere to begin...";
             #endif
 
-            Coroutine flasher = StartCoroutine(Flasher(pressAnyKeyText));
+            Coroutine blinker = StartCoroutine(Blinker(pressAnyKeyText));
             Tween tween;
 
             while (!Input.anyKeyDown && Input.touchCount == 0)
@@ -65,17 +61,10 @@ namespace AllBets
 
             }
 
-            // tween = titleGroup.DOFade(0,fadeDuration);
-            // // tween = shine.DOFade(0,fadeDuration);
-            // while (tween.IsPlaying()) yield return null;
-
-            // tween = missionGroup.DOFade(1,fadeDuration);
-            // while (tween.IsPlaying()) yield return null;
-            // yield return new WaitForSeconds(secondsUntilFade);
-            StopCoroutine(flasher);
+            StopCoroutine(blinker);
 
             tween = missionGroup.DOFade(0,fadeDuration);
-            while (tween.IsPlaying()) yield return null;
+            while (tween.IsActive()) yield return null;
 
             GameManager.Instance.EnableGUI();
             GameManager.Instance.BeginGame();

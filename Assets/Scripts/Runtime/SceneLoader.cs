@@ -59,7 +59,7 @@ namespace AllBets
             OnLoadingProgressUpdate?.Invoke(0);
             loadingGraphics.gameObject.SetActive(true);
             Tween tween = loadingGraphics.DOFade(1,.25f);
-            while (tween.IsPlaying()) yield return null;
+            while (tween.IsActive()) yield return null;
 
             // Unload the currently loaded scene if there is one
             AsyncOperation tracker;

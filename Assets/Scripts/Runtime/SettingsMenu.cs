@@ -27,8 +27,7 @@ namespace AllBets
             // Wait until the camera gets in position
             while (MenuCameraController.Instance.IsBlending || MainMenu.Instance.IsTransitioning) yield return null;
             
-            transitionSequence = DOTween.Sequence();
-            print("Showing Settings menu");
+            transitionSequence = DOTween.Sequence(gameObject);
 
             // Fade the black background in
             transitionSequence.Append(
@@ -47,12 +46,13 @@ namespace AllBets
             transitionSequence.Join(
                 settingsGroup.DOFade(1,1)
             );
+
+            transitionSequence.Play();
         }
 
         IEnumerator HideRoutine()
         {
-            transitionSequence = DOTween.Sequence();
-            print("Hiding Settings menu");
+            transitionSequence = DOTween.Sequence(gameObject);
 
             // Fade the rest out
             transitionSequence.Append(
@@ -74,10 +74,12 @@ namespace AllBets
 
             transitionSequence.OnComplete(
                 ()=>{
-                    // MenuCameraController.Instance.frames[1].SetActive(false);
                     this.gameObject.SetActive(false);
                 }
             );
+            
+            // Make sure to play the sequence
+            transitionSequence.Play();
 
             yield break;
         }

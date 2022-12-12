@@ -36,7 +36,7 @@ namespace AllBets
         void Start()
         {
             material.SetInt("_RotationEnabled", 1);
-            transform.DOScale(2.6f,scaleDuration)
+            scaleTween = transform.DOScale(2.6f,scaleDuration)
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetEase(Ease.InOutSine)
             ;

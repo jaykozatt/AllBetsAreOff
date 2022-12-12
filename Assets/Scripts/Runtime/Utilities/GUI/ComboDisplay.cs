@@ -10,6 +10,12 @@ namespace AllBets
         RectTransform[] cards;
         Sequence[] tweens;
 
+        private void OnDestroy() 
+        {
+            foreach (Sequence sequence in tweens)
+                sequence.Kill();
+        }
+
         private void Awake() 
         {
             DOTween.Init();

@@ -20,11 +20,10 @@ namespace AllBets
 
         IEnumerator ShowRoutine()
         {
-            sequence = DOTween.Sequence();
             while (MenuCameraController.Instance.IsBlending || SettingsMenu.Instance.IsTransitioning) 
                 yield return null;
 
-            print("Showing Main menu.");
+            sequence = DOTween.Sequence(gameObject);
 
             sequence.Append(
                 menuGroup.DOFade(1,MenuCameraController.Instance.BlendingTime)
@@ -35,28 +34,29 @@ namespace AllBets
             sequence.Join(
                 dustVFX.DOFade(1,MenuCameraController.Instance.BlendingTime)
             );
+
+            sequence.Play();
         }
 
         IEnumerator HideRoutine()
         {
-            sequence = DOTween.Sequence();
-
-            print("Hiding Main menu.");
+            sequence = DOTween.Sequence(gameObject);
 
             sequence.Append(
-                menuGroup.DOFade(0,MenuCameraController.Instance.BlendingTime)
+                menuGroup.DOFade(0,1)
             );
             sequence.Join(
-                redChip.DOFade(0,MenuCameraController.Instance.BlendingTime)
+                redChip.DOFade(0,1)
             );
             sequence.Join(
-                dustVFX.DOFade(0,MenuCameraController.Instance.BlendingTime)
+                dustVFX.DOFade(0,1)
             );
 
             sequence.OnComplete(
                 ()=>this.gameObject.SetActive(false)
             );
 
+            sequence.Play();
             yield break;
         }
 
@@ -71,13 +71,13 @@ namespace AllBets
         {
             this.gameObject.SetActive(true);
 
-            sequence?.Kill();
+            if (sequence.IsActive()) sequence.Kill();
             showHideRoutine = StartCoroutine(ShowRoutine());
         }
 
         public void Hide()
         {
-            sequence?.Kill();
+            if (sequence.IsActive()) sequence.Kill();
             showHideRoutine = StartCoroutine(HideRoutine());
         }
 
