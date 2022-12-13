@@ -10,7 +10,7 @@ using System.Linq;
 namespace AllBets
 {
     public enum Scene {
-        None, MainMenu, ClassicMode, EndlessMode
+        None, MainMenu, Game
     }
 
     public class SceneLoader : StaticInstance<SceneLoader>

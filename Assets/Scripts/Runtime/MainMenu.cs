@@ -83,7 +83,14 @@ namespace AllBets
 
         public void PlayClassicMode()
         {
-            SceneLoader.Instance.TryLoadScene(Scene.ClassicMode);
+            GameManager.gameMode = GameMode.Classic;
+            SceneLoader.Instance.TryLoadScene(Scene.Game);
+        }
+
+        public void PlayEndlessMode()
+        {
+            GameManager.gameMode = GameMode.Endless;
+            SceneLoader.Instance.TryLoadScene(Scene.Game);
         }
 
         public void GoToSettings()

@@ -96,35 +96,6 @@ MonoBehaviour:
   IsGlobal: 1
   Labels: []
   Exists: 1
---- !u!114 &-5701721153773959832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/Music Theme
-  m_EditorClassIdentifier: 
-  Path: event:/Music Theme
-  Guid:
-    Data1: -569544127
-    Data2: 1210331983
-    Data3: -431402070
-    Data4: 471531519
-  Banks:
-  - {fileID: -1171480222449856855}
-  IsStream: 1
-  Is3D: 0
-  IsOneShot: 0
-  Parameters:
-  - {fileID: 9048714964970370254}
-  - {fileID: 8696896070027328318}
-  MinDistance: 0
-  MaxDistance: 0
-  Length: 81860
 --- !u!114 &-5258207227853377701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,10 +111,10 @@ MonoBehaviour:
   Path: Assets/Audio/FMOD Banks/Mobile/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638062948097156307
+  lastModified: 638064479746203873
   FileSizes:
   - Name: 
-    Value: 1504
+    Value: 1586
   Exists: 1
 --- !u!114 &-4727523368973313384
 MonoBehaviour:
@@ -173,6 +144,54 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 0
+--- !u!114 &-4168348733544037482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Game BGM/Game State
+  m_EditorClassIdentifier: 
+  Name: Game State
+  StudioPath: 
+  Min: 0
+  Max: 3
+  Default: 0
+  ID:
+    data1: 3590602784
+    data2: 17011643
+  Type: 1
+  IsGlobal: 1
+  Labels: []
+  Exists: 1
+--- !u!114 &-3613994157586119846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Game BGM/BGM Volume
+  m_EditorClassIdentifier: 
+  Name: BGM Volume
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0.5
+  ID:
+    data1: 2183217207
+    data2: 2509209023
+  Type: 0
+  IsGlobal: 1
+  Labels: []
+  Exists: 1
 --- !u!114 &-1801981099595643117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,7 +207,7 @@ MonoBehaviour:
   Path: Assets/Audio/FMOD Banks/Mobile/SoundFX.streams.bank
   Name: SoundFX.streams
   StudioPath: bank:/SoundFX.streams
-  lastModified: 638062948101576560
+  lastModified: 638064479748964031
   FileSizes: []
   Exists: 1
 --- !u!114 &-1171480222449856855
@@ -206,7 +225,7 @@ MonoBehaviour:
   Path: Assets/Audio/FMOD Banks/Mobile/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638062948093146078
+  lastModified: 638064479733663156
   FileSizes: []
   Exists: 1
 --- !u!114 &-946949733922877797
@@ -282,7 +301,6 @@ MonoBehaviour:
   - {fileID: 3668854712733273909}
   - {fileID: -1801981099595643117}
   EditorEvents:
-  - {fileID: -5701721153773959832}
   - {fileID: 1331398447928737978}
   - {fileID: 5485948875284979914}
   - {fileID: 3743755983882143374}
@@ -290,6 +308,8 @@ MonoBehaviour:
   - {fileID: 3020367064862035743}
   - {fileID: -4727523368973313384}
   - {fileID: 159188324334212445}
+  - {fileID: 4436198979817621354}
+  - {fileID: 8552705806510664360}
   EditorParameters:
   - {fileID: 6559220187947718251}
   - {fileID: 2326845624166844627}
@@ -298,7 +318,7 @@ MonoBehaviour:
   - {fileID: -1171480222449856855}
   StringsBanks:
   - {fileID: -5258207227853377701}
-  cacheTime: 638062948101576560
+  cacheTime: 638064479748964031
   cacheVersion: 10
 --- !u!114 &159188324334212445
 MonoBehaviour:
@@ -319,6 +339,7 @@ MonoBehaviour:
     Data3: 1580928143
     Data4: 553939341
   Banks:
+  - {fileID: -1171480222449856855}
   - {fileID: 3668854712733273909}
   IsStream: 1
   Is3D: 0
@@ -422,7 +443,7 @@ MonoBehaviour:
   Path: Assets/Audio/FMOD Banks/Mobile/SoundFX.assets.bank
   Name: SoundFX.assets
   StudioPath: bank:/SoundFX.assets
-  lastModified: 638062948099186423
+  lastModified: 638064479747433943
   FileSizes: []
   Exists: 1
 --- !u!114 &2326845624166844627
@@ -492,7 +513,7 @@ MonoBehaviour:
   Path: Assets/Audio/FMOD Banks/Mobile/SoundFX.bank
   Name: SoundFX
   StudioPath: bank:/SoundFX
-  lastModified: 638062948097386320
+  lastModified: 638064479746383883
   FileSizes: []
   Exists: 1
 --- !u!114 &3743755983882143374
@@ -547,6 +568,35 @@ MonoBehaviour:
   IsGlobal: 1
   Labels: []
   Exists: 1
+--- !u!114 &4436198979817621354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Game BGM
+  m_EditorClassIdentifier: 
+  Path: event:/Game BGM
+  Guid:
+    Data1: -569544127
+    Data2: 1210331983
+    Data3: -431402070
+    Data4: 471531519
+  Banks:
+  - {fileID: -1171480222449856855}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: -4168348733544037482}
+  - {fileID: -3613994157586119846}
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 81860
 --- !u!114 &5485948875284979914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -575,6 +625,30 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 378
+--- !u!114 &5951514724250286384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Main Menu BGM/Loop Count
+  m_EditorClassIdentifier: 
+  Name: Loop Count
+  StudioPath: 
+  Min: 0
+  Max: 10
+  Default: 0
+  ID:
+    data1: 1746639210
+    data2: 636226262
+  Type: 1
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &5985187124988030550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,7 +688,7 @@ MonoBehaviour:
   Path: Assets/Audio/FMOD Banks/Mobile/Master.assets.bank
   Name: Master.assets
   StudioPath: bank:/Master.assets
-  lastModified: 638062948095476211
+  lastModified: 638064479735063236
   FileSizes: []
   Exists: 1
 --- !u!114 &6559220187947718251
@@ -638,6 +712,30 @@ MonoBehaviour:
     data1: 3590602784
     data2: 17011643
   Type: 1
+  IsGlobal: 1
+  Labels: []
+  Exists: 1
+--- !u!114 &7005982790876964879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Main Menu BGM/BGM Volume
+  m_EditorClassIdentifier: 
+  Name: BGM Volume
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0.5
+  ID:
+    data1: 2183217207
+    data2: 2509209023
+  Type: 0
   IsGlobal: 1
   Labels: []
   Exists: 1
@@ -680,10 +778,10 @@ MonoBehaviour:
   Path: Assets/Audio/FMOD Banks/Mobile/Master.streams.bank
   Name: Master.streams
   StudioPath: bank:/Master.streams
-  lastModified: 638062948097126305
+  lastModified: 638064479746073866
   FileSizes: []
   Exists: 1
---- !u!114 &8696896070027328318
+--- !u!114 &8552705806510664360
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -692,42 +790,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
-  m_Name: parameter:/Music Theme/BGM Volume
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Main Menu BGM
   m_EditorClassIdentifier: 
-  Name: BGM Volume
-  StudioPath: 
-  Min: 0
-  Max: 1
-  Default: 0.5
-  ID:
-    data1: 2183217207
-    data2: 2509209023
-  Type: 0
-  IsGlobal: 1
-  Labels: []
-  Exists: 1
---- !u!114 &9048714964970370254
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
-  m_Name: parameter:/Music Theme/Game State
-  m_EditorClassIdentifier: 
-  Name: Game State
-  StudioPath: 
-  Min: 0
-  Max: 3
-  Default: 0
-  ID:
-    data1: 3590602784
-    data2: 17011643
-  Type: 1
-  IsGlobal: 1
-  Labels: []
-  Exists: 1
+  Path: event:/Main Menu BGM
+  Guid:
+    Data1: -1178991406
+    Data2: 1198947308
+    Data3: -1725412221
+    Data4: 579473717
+  Banks:
+  - {fileID: -1171480222449856855}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: 7005982790876964879}
+  - {fileID: 5951514724250286384}
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 28821

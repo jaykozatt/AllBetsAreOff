@@ -3648,7 +3648,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1255855064}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
   m_Name: 
@@ -3686,11 +3686,11 @@ MonoBehaviour:
   CollisionTag: 
   EventReference:
     Guid:
-      Data1: -569544127
-      Data2: 1210331983
-      Data3: -431402070
-      Data4: 471531519
-    Path: event:/Music Theme
+      Data1: -1178991406
+      Data2: 1198947308
+      Data3: -1725412221
+      Data4: 579473717
+    Path: event:/Main Menu BGM
   Event: 
   PlayEvent: 1
   StopEvent: 2
@@ -3758,7 +3758,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Not Implemented
+  m_text: Endless!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 77ce0b2f3222e9e4aade1fa8d40fe104, type: 2}
   m_sharedMaterial: {fileID: -5925512155474111693, guid: 77ce0b2f3222e9e4aade1fa8d40fe104, type: 2}
@@ -3785,7 +3785,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 26.1
+  m_fontSize: 47.35
   m_fontSizeBase: 44
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4142,18 +4142,18 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 1373318339}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 318394869}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 318394872}
+        m_TargetAssemblyTypeName: AllBets.MainMenu, Assembly-CSharp
+        m_MethodName: PlayEndlessMode
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

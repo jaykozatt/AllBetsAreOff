@@ -2,44 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 namespace AllBets
 {
     public class ComboDisplay : MonoBehaviour
     {
-        RectTransform[] cards;
-        Sequence[] tweens;
+        [SerializeField] RectTransform card;
+        TextMeshProUGUI textMesh;
+        Sequence sequence;
 
         private void OnDestroy() 
         {
-            foreach (Sequence sequence in tweens)
-                sequence.Kill();
+            sequence.Kill();
         }
 
         private void Awake() 
         {
             DOTween.Init();
             DOTween.defaultAutoPlay = AutoPlay.AutoPlayTweeners;
-            
-            cards = new RectTransform[transform.childCount];
-            tweens = new Sequence[transform.childCount];
 
-            int index = 0;
-            foreach(RectTransform child in transform)
-            {
-                cards[index] = child;
-                tweens[index] = DOTween.Sequence();
-                tweens[index].SetAutoKill(false);
+            textMesh = card.GetComponentInChildren<TextMeshProUGUI>();
 
-                tweens[index].Append(
-                    child.DOPivotY(0, .5f).SetEase(Ease.OutQuad)
-                );
-                tweens[index].Append(
-                    child.DOPivotY(-.65f, GameManager.Instance.timeUntilComboReset).SetEase(Ease.InOutCubic)
-                );
+            sequence = DOTween.Sequence();
+            sequence.SetAutoKill(false);
 
-                index++;
-            }
+            sequence.Append(
+                card.DOPivotY(0, .5f).SetEase(Ease.OutQuad)
+            );
+            sequence.Append(
+                card.DOPivotY(-.65f, GameManager.Instance.timeUntilComboReset).SetEase(Ease.InOutCubic)
+            );
         }
 
         private void Start() 
@@ -49,10 +42,8 @@ namespace AllBets
 
         public void UpdateCombo(int currentMultiplier)
         {
-            for (int i=0; i<=currentMultiplier-2; i++)
-            {
-                tweens[i].Restart();
-            }
+            textMesh.text = $"{currentMultiplier}x";
+            sequence.Restart();
         }
     }
 }

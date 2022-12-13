@@ -25,6 +25,10 @@ namespace AllBets
         private void Awake() 
         {
             DOTween.Init();
+        }
+
+        private void Start() 
+        {
             sequence = DOTween.Sequence();
             sequence.SetAutoKill(false);
             sequence.SetEase(Ease.InOutQuad);
@@ -32,34 +36,27 @@ namespace AllBets
             Vector2 horizontalCurtains = leftCurtain.sizeDelta;
             Vector2 verticalCurtains = topCurtain.sizeDelta;
 
-            horizontalCurtains.x = Screen.width/2;
-            verticalCurtains.y = Screen.height/2;
-
-            leftCurtain.sizeDelta = horizontalCurtains;
-            rightCurtain.sizeDelta = horizontalCurtains;
-            topCurtain.sizeDelta = verticalCurtains;
-            bottomCurtain.sizeDelta = verticalCurtains;
-
             // Begin shrinking the gradient
             sequence.Append(
-                radialGradient.DOScale(0, 1)
+                radialGradient.DOScale(Vector2.zero, 1)
             );
 
             // As the gradient shrinks, close in the curtains
             sequence.Join(
-                leftCurtain.DOPivotX(0, 1)
+                leftCurtain.DOAnchorMax(new Vector2(.5f, leftCurtain.anchorMax.y), 1)
             );
             sequence.Join(
-                rightCurtain.DOPivotX(1, 1)
+                rightCurtain.DOAnchorMin(new Vector2(.5f, rightCurtain.anchorMin.y), 1)
             );
             sequence.Join(
-                topCurtain.DOPivotY(1, 1)
+                topCurtain.DOAnchorMin(new Vector2(topCurtain.anchorMin.x, .5f), 1)
             );
             sequence.Join(
-                bottomCurtain.DOPivotY(0, 1)
+                bottomCurtain.DOAnchorMax(new Vector2(bottomCurtain.anchorMax.x, .5f), 1)
             );
 
             sequence.OnComplete(()=> OnComplete?.Invoke());
+            
         }
 
         public void CloseCurtain()

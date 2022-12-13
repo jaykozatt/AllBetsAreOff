@@ -498,8 +498,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1769144323}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: Reset
+        m_TargetAssemblyTypeName: AllBets.GameManager, Assembly-CSharp
+        m_MethodName: ResetGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -767,7 +767,7 @@ MonoBehaviour:
       Data2: 1210331983
       Data3: -431402070
       Data4: 471531519
-    Path: event:/Music Theme
+    Path: event:/Game BGM
   Event: 
   PlayEvent: 1
   StopEvent: 2
@@ -17640,7 +17640,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 407661809}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.035595536, y: -9.350981, z: -22}
+  m_LocalPosition: {x: -0.035595298, y: -9.350981, z: -22}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 381448060}
@@ -19313,8 +19313,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1769144323}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: Reset
+        m_TargetAssemblyTypeName: AllBets.GameManager, Assembly-CSharp
+        m_MethodName: ResetGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -20517,7 +20517,7 @@ GameObject:
   - component: {fileID: 849981736}
   - component: {fileID: 849981735}
   m_Layer: 5
-  m_Name: Divider
+  m_Name: ---------------
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21105,6 +21105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 545cd9b5bd9ebcd42b639be92f7e2277, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  card: {fileID: 1894067871}
 --- !u!1 &1042636394
 GameObject:
   m_ObjectHideFlags: 0
@@ -24648,8 +24649,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1508845602}
-  - component: {fileID: 1508845604}
-  - component: {fileID: 1508845603}
   m_Layer: 5
   m_Name: Top Bar
   m_TagString: Untagged
@@ -24680,44 +24679,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 1}
---- !u!114 &1508845603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1508845601}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.7921569, g: 0.827451, b: 0.78431374, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 0.2
---- !u!222 &1508845604
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1508845601}
-  m_CullTransparentMesh: 1
 --- !u!1 &1512097365
 GameObject:
   m_ObjectHideFlags: 0
@@ -29924,7 +29885,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1603652703}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.8894043, y: -8.420981, z: -18}
+  m_LocalPosition: {x: 0.8894044, y: -8.420981, z: -18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 209710886}
@@ -35945,8 +35906,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeDuration: 1
-  secondsUntilFade: 3
-  shine: {fileID: 726048309}
   titleGroup: {fileID: 0}
   missionGroup: {fileID: 721381674}
   pressAnyKeyText: {fileID: 1085567150}
@@ -36196,8 +36155,9 @@ MonoBehaviour:
     seconds: 0
   timeUntilComboReset: 3
   maxMultiplier: 6
-  scoreUI: {fileID: 1069314001}
-  timerUI: {fileID: 1209652268}
+  scoreText: {fileID: 1069314001}
+  timerText: {fileID: 1209652268}
+  timerUI: {fileID: 1129371391}
   gameOverDisplay: {fileID: 585249179}
   youWinDisplay: {fileID: 1163683451}
   pauseDisplay: {fileID: 1364703875}
@@ -37199,8 +37159,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1769144323}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: Reset
+        m_TargetAssemblyTypeName: AllBets.GameManager, Assembly-CSharp
+        m_MethodName: ResetGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
