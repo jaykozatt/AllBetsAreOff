@@ -197,7 +197,7 @@ namespace AllBets
 
                 if (GameManager.Instance.gameState == GameState.Playing)
                 {
-                    #if UNITY_STANDALONE || UNITY_EDITOR
+                    #if UNITY_STANDALONE || UNITY_WEBGL || UNITY_EDITOR
                         input.x = Input.GetAxis("Horizontal");
                         input.y = Input.GetAxis("Vertical");
                         

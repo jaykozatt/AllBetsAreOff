@@ -16,7 +16,7 @@ namespace AllBets
                 KeyboardScheme.SetActive(false);
             #endif
 
-            #if UNITY_STANDALONE
+            #if UNITY_STANDALONE || UNITY_WEBGL
                 TouchScheme.SetActive(false);
                 KeyboardScheme.SetActive(true);
             #endif
