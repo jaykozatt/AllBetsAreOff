@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using DG.Tweening;
 
 namespace AllBets
 {
@@ -21,12 +22,16 @@ namespace AllBets
 
         #region Settings
         [Header("Settings")]
+            public float camShakeIntensity=2f;
+            public float freezeDuration=1f;
             public Frame frame1;
             public Frame frame2;
             public Frame frame3;
+            public Frame frame4;
         #endregion
 
         Camera cam;
+        CinemachineImpulseSource impulseSource;
         EdgeCollider2D boundingCollider;
         List<Vector2> boundingPositions;
         Vector3[] viewportCorners;
@@ -35,6 +40,7 @@ namespace AllBets
         {
             cam = Camera.main;
             boundingCollider = cam.GetComponent<EdgeCollider2D>();
+            impulseSource = GetComponent<CinemachineImpulseSource>();
             CinemachineVirtualCamera[] vcams = GetComponentsInChildren<CinemachineVirtualCamera>();
             
             boundingPositions = new List<Vector2>(5);
@@ -48,10 +54,12 @@ namespace AllBets
             frame1.vcam = vcams[0];
             frame2.vcam = vcams[1];
             frame3.vcam = vcams[2];
+            frame4.vcam = vcams[3];
 
             frame1.SetActive(true);
             frame2.SetActive(false);
             frame3.SetActive(false);
+            frame4.SetActive(false);
             
         }
 
@@ -81,6 +89,34 @@ namespace AllBets
             Vector3 point = cam.WorldToViewportPoint(position);
 
             return point.x < 0 || point.x > 1 || point.y < 0 && point.y > 1;
+        }
+
+        public void Shake()
+        {
+            impulseSource.GenerateImpulse(camShakeIntensity*5f);
+        }
+
+        public void ImpactFrom(Vector3 position, Vector3 velocity)
+        {
+            impulseSource.GenerateImpulseAt(position, camShakeIntensity*velocity);
+        }
+
+        public void FreezeShake()
+        {
+            Time.timeScale = 0;
+
+            frame4.SetActive();
+            Shake();
+
+            DOTween.To(
+                ()=>Time.timeScale,
+                (value)=>Time.timeScale=value,
+                1, freezeDuration
+            )
+                .SetEase(Ease.InExpo)
+                .SetUpdate(true)
+                .OnComplete(()=>frame4.SetActive(false))
+            ;
         }
     }
 }

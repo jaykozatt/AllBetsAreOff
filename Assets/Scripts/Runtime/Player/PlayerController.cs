@@ -10,6 +10,7 @@ namespace AllBets
         [Header("Settings")]
             public int lives = 3;
             public int invincibilityFrames = 10;
+            public int damageKnockbackForce = 2;
             public float movingSpeed = 90;
             public string tacklingLayerName = "Player Tackling";
         #endregion
@@ -31,7 +32,7 @@ namespace AllBets
         #endregion
 
         #region Variables & Switches
-            int framesUntilVulnerable = 0;
+            float framesUntilVulnerable = 0;
             Vector2 input;
             float lookaheadValue;
             bool isReeling = false;
@@ -170,7 +171,7 @@ namespace AllBets
                 ProcessInput();
 
                 // Tick invincibility freames        
-                framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - 1);
+                framesUntilVulnerable = Mathf.Max(0, framesUntilVulnerable - Time.timeScale);
             }
 
             private void FixedUpdate() 
@@ -214,7 +215,7 @@ namespace AllBets
                 }
             }
 
-            public void GetHurt()
+            public void GetHurt(Vector3 velocity)
             {
                 // Unless currently invulnerable or reeling into a tackle,
                 // decrease the lives' counter
@@ -222,7 +223,8 @@ namespace AllBets
                 {
                     lives = Mathf.Max(0, lives - 1);
                     framesUntilVulnerable = invincibilityFrames;
-                    
+
+                    CameraController.Instance.FreezeShake();
                     LivesInterface.Instance.UpdateDisplay(lives);
                     LivesInterface.Instance.HurtFlash();
                     tackleInstance.start();
@@ -232,6 +234,10 @@ namespace AllBets
                     {
                         GameManager.Instance.LoseGame();
                         Destroy(transform.parent.gameObject);
+                    }
+                    else 
+                    {
+                        rb.AddForce(rb.mass * damageKnockbackForce * velocity.normalized, ForceMode2D.Impulse);
                     }
                 }
             }

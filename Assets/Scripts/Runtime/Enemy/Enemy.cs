@@ -100,7 +100,7 @@ namespace AllBets
             {
                 if (other.collider.CompareTag("Player") && isAttacking)
                 {
-                    PlayerController.Instance.GetHurt();
+                    PlayerController.Instance.GetHurt(-other.relativeVelocity);
                 }
             }
 
@@ -108,7 +108,7 @@ namespace AllBets
             {
                 if (other.collider.CompareTag("Player") && isAttacking)
                 {
-                    PlayerController.Instance.GetHurt();
+                    PlayerController.Instance.GetHurt(-other.relativeVelocity);
                 }
             }
             private void OnDisable() 
